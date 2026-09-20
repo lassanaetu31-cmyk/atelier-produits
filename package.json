@@ -1,0 +1,13 @@
+{
+  "name": "atelier-produits",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:invoice": "npm run dev --workspace apps/invoice",
+    "build:invoice": "npm run build --workspace apps/invoice"
+  }
+}
