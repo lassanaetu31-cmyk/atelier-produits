@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProductsView from "./components/ProductsView";
+import CatalogView from "./components/CatalogView";
 import ProfileView from "./components/ProfileView";
 import { useProfile } from "./profile";
 import { useLicense } from "./license-context";
@@ -11,14 +12,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "catalog", label: "Catalogue" },
   { id: "profile", label: "Profil" },
 ];
-
-function Placeholder({ title }: { title: string }) {
-  return (
-    <div className="rounded-xl border border-dashed bg-white p-10 text-center text-slate-400">
-      {title} — à venir
-    </div>
-  );
-}
 
 export default function App() {
   const { license, deactivate } = useLicense();
@@ -61,7 +54,7 @@ export default function App() {
 
       <main className="mx-auto max-w-4xl p-6">
         {tab === "products" && <ProductsView />}
-        {tab === "catalog" && <Placeholder title="Catalogue PDF + WhatsApp" />}
+        {tab === "catalog" && <CatalogView />}
         {tab === "profile" && <ProfileView />}
       </main>
     </div>

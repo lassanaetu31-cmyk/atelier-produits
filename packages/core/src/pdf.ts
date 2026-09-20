@@ -134,3 +134,135 @@ export function downloadDocumentPdf(data: DocumentData): void {
   const doc = buildDocumentPdf(data);
   doc.save(`${data.kind}-${data.number}.pdf`);
 }
+
+// ------------------------------------------------------------------
+// Catalogue produits (app Catalog Builder)
+// ------------------------------------------------------------------
+
+export interface CatalogShop {
+  name: string;
+  logoDataUrl?: string;
+  accentColor?: string;
+  address?: string;
+  whatsappPhone?: string;
+  currency: Currency;
+}
+
+export interface CatalogProduct {
+  name: string;
+  price: number;
+  category?: string;
+  available: boolean;
+  imageDataUrl?: string;
+}
+
+/**
+ * Construit un catalogue produits en grille (2 colonnes).
+ * @param qrDataUrl QR (PNG data URL) du contact WhatsApp, généré en amont (optionnel).
+ */
+export function buildCatalogPdf(
+  shop: CatalogShop,
+  products: CatalogProduct[],
+  qrDataUrl?: string,
+): jsPDF {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const accent = hexToRgb(shop.accentColor ?? "#4f46e5");
+  const PW = 210;
+  const PH = 297;
+  const M = 12;
+
+  // En-tête
+  let hx = M;
+  if (shop.logoDataUrl) {
+    try {
+      const fmt = shop.logoDataUrl.includes("image/png") ? "PNG" : "JPEG";
+      doc.addImage(shop.logoDataUrl, fmt, M, M, 22, 22);
+      hx = M + 27;
+    } catch {
+      /* logo illisible */
+    }
+  }
+  doc.setFontSize(20);
+  doc.setTextColor(...accent);
+  doc.text(shop.name, hx, M + 9);
+  doc.setFontSize(9);
+  doc.setTextColor(110);
+  const contact = [shop.whatsappPhone && `WhatsApp : ${shop.whatsappPhone}`, shop.address]
+    .filter(Boolean)
+    .join("  ·  ");
+  if (contact) doc.text(contact, hx, M + 16);
+
+  if (qrDataUrl) {
+    try {
+      doc.addImage(qrDataUrl, "PNG", PW - M - 22, M, 22, 22);
+      doc.setFontSize(7);
+      doc.setTextColor(130);
+      doc.text("Commander", PW - M - 11, M + 25, { align: "center" });
+    } catch {
+      /* qr illisible */
+    }
+  }
+
+  doc.setDrawColor(...accent);
+  doc.line(M, M + 30, PW - M, M + 30);
+
+  // Grille
+  const cols = 2;
+  const gapX = 8;
+  const gapY = 8;
+  const colW = (PW - 2 * M - gapX) / cols;
+  const imgH = 50;
+  const cardH = imgH + 24;
+  const bottom = PH - M;
+
+  let y = M + 36;
+  let col = 0;
+
+  for (const p of products) {
+    if (y + cardH > bottom) {
+      doc.addPage();
+      y = M;
+      col = 0;
+    }
+    const x = M + col * (colW + gapX);
+
+    doc.setDrawColor(225, 225, 225);
+    doc.roundedRect(x, y, colW, cardH, 2, 2);
+
+    if (p.imageDataUrl) {
+      try {
+        const fmt = p.imageDataUrl.includes("image/png") ? "PNG" : "JPEG";
+        doc.addImage(p.imageDataUrl, fmt, x + 1, y + 1, colW - 2, imgH, undefined, "FAST");
+      } catch {
+        /* image illisible */
+      }
+    } else {
+      doc.setFillColor(245, 245, 245);
+      doc.rect(x + 1, y + 1, colW - 2, imgH, "F");
+    }
+
+    const tx = x + 3;
+    let ty = y + imgH + 7;
+    doc.setFontSize(10);
+    doc.setTextColor(30);
+    const nameLines = doc.splitTextToSize(p.name, colW - 6).slice(0, 2);
+    doc.text(nameLines, tx, ty);
+    ty += nameLines.length * 4.5 + 1;
+    doc.setFontSize(11);
+    doc.setTextColor(...accent);
+    doc.text(formatMoney(p.price, shop.currency), tx, ty);
+    if (!p.available) {
+      doc.setFontSize(8);
+      doc.setTextColor(200, 60, 60);
+      doc.text("indisponible", x + colW - 3, y + imgH + 7, { align: "right" });
+    }
+
+    col++;
+    if (col >= cols) {
+      col = 0;
+      y += cardH + gapY;
+    }
+  }
+
+  return doc;
+}
