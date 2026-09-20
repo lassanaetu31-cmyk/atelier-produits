@@ -16,10 +16,11 @@ export interface LicenseCheck {
   payload?: LicensePayload;
 }
 
-// Secret de démo. En prod : signer côté vendeur, ne PAS exposer le secret dans le binaire client v2.
-const DEMO_SECRET = "atelier-produits-v1";
+// Secret de licence v1 (HMAC). DOIT être identique à tools/genkey.mjs.
+// Limite v1 : présent dans le bundle client. v2 = signature asymétrique / serveur.
+const LICENSE_SECRET = "NcPaZ77WztD-PZEoLqnh8Q2IHvT5OfKpk8JnfFLS7Ew";
 
-async function hmac(data: string, secret = DEMO_SECRET): Promise<string> {
+async function hmac(data: string, secret = LICENSE_SECRET): Promise<string> {
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey(
     "raw",

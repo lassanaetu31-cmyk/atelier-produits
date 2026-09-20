@@ -12,7 +12,8 @@
 
 import crypto from "node:crypto";
 
-const SECRET = process.env.ATELIER_LICENSE_SECRET || "atelier-produits-v1";
+// DOIT rester identique à LICENSE_SECRET dans packages/core/src/license.ts.
+const SECRET = process.env.ATELIER_LICENSE_SECRET || "NcPaZ77WztD-PZEoLqnh8Q2IHvT5OfKpk8JnfFLS7Ew";
 
 const [, , product = "invoice-generator", buyer = "Client", plan = "pro", days = "0"] =
   process.argv;
