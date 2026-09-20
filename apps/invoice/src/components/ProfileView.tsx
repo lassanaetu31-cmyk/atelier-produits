@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { exportBackup, importBackup } from "../backup";
 import { DEFAULT_PROFILE, saveProfile, useProfile } from "../profile";
 import type { CompanyProfile } from "../types";
 
@@ -34,6 +35,20 @@ export default function ProfileView() {
     await saveProfile(form);
     setFlash("Profil enregistré ✓");
     setTimeout(() => setFlash(""), 2500);
+  }
+
+  async function restore(file?: File) {
+    if (!file) return;
+    if (!confirm("Restaurer cette sauvegarde remplacera toutes les données actuelles. Continuer ?")) {
+      return;
+    }
+    try {
+      await importBackup(file);
+      alert("Sauvegarde restaurée. La page va se recharger.");
+      location.reload();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Restauration impossible.");
+    }
   }
 
   return (
@@ -132,6 +147,30 @@ export default function ProfileView() {
           Enregistrer le profil
         </button>
         {flash && <span className="text-sm font-medium text-green-600">{flash}</span>}
+      </div>
+
+      <div className="mt-2 grid gap-2 border-t pt-4">
+        <h3 className="text-sm font-semibold">Sauvegarde des données</h3>
+        <p className="-mt-1 text-xs text-slate-400">
+          Vos données restent sur cet appareil. Exportez une sauvegarde régulièrement.
+        </p>
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <button
+            className="rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50"
+            onClick={() => exportBackup()}
+          >
+            Exporter une sauvegarde
+          </button>
+          <label className="cursor-pointer rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50">
+            Restaurer une sauvegarde
+            <input
+              type="file"
+              accept="application/json"
+              className="hidden"
+              onChange={(e) => restore(e.target.files?.[0])}
+            />
+          </label>
+        </div>
       </div>
     </section>
   );

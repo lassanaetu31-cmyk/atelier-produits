@@ -1,0 +1,75 @@
+==================================================
+ INVOICE GENERATOR — Factures & Devis professionnels
+==================================================
+
+Merci pour votre achat !
+
+Ce logiciel fonctionne HORS-LIGNE, directement dans votre navigateur.
+Aucune installation, aucun compte, aucune connexion requise.
+Vos données restent sur VOTRE appareil.
+
+
+--------------------------------------------------
+1) OUVRIR LE LOGICIEL
+--------------------------------------------------
+- Double-cliquez sur le fichier :  Invoice-Generator.html
+- Ouvrez-le de préférence avec GOOGLE CHROME ou MICROSOFT EDGE.
+  (Sur téléphone : ouvrez le fichier avec Chrome.)
+- Astuce : clic droit sur le fichier > "Ouvrir avec" > Chrome.
+
+IMPORTANT : ne déplacez pas le fichier après l'avoir ouvert la
+première fois, et n'effacez pas les données de navigation du site,
+sinon vos factures enregistrées seront perdues (voir Sauvegarde).
+
+
+--------------------------------------------------
+2) ACTIVER VOTRE LICENCE
+--------------------------------------------------
+- Au premier lancement, collez la CLÉ DE LICENCE reçue avec votre achat.
+- Cliquez sur "Activer". C'est fait, à vie (sauf licence à durée limitée).
+- Pas reçu de clé ? Répondez au message d'achat avec votre reçu.
+
+
+--------------------------------------------------
+3) UTILISATION
+--------------------------------------------------
+- Onglet PROFIL : renseignez votre entreprise (nom, logo, couleur,
+  coordonnées, notes de bas de page). Ces infos apparaissent sur chaque PDF.
+- Onglet CLIENTS : enregistrez vos clients pour aller plus vite.
+- Onglet ÉDITEUR :
+    * choisissez le type (Facture, Devis, Reçu, Proposition),
+    * ajoutez vos lignes (description, quantité, prix),
+    * remise / taxe / livraison si besoin,
+    * "Télécharger le PDF" génère le document ET l'enregistre.
+- Onglet HISTORIQUE : retrouvez, rouvrez, re-téléchargez vos documents.
+    * Un DEVIS peut être converti en FACTURE en un clic.
+- Les numéros (F-2026-0001...) sont attribués automatiquement.
+
+
+--------------------------------------------------
+4) SAUVEGARDE (À FAIRE RÉGULIÈREMENT)
+--------------------------------------------------
+Vos données sont stockées localement par votre navigateur.
+Pour ne rien perdre :
+- Onglet PROFIL > "Exporter une sauvegarde" : enregistre un fichier .json.
+- Gardez ce fichier en lieu sûr (clé USB, email, cloud).
+- Pour récupérer vos données (nouvel appareil, réinstallation) :
+  PROFIL > "Restaurer une sauvegarde".
+
+
+--------------------------------------------------
+5) BON À SAVOIR
+--------------------------------------------------
+- Le logiciel n'envoie aucune donnée sur Internet.
+- Les modèles de facture ne sont pas garantis conformes à une
+  réglementation fiscale particulière. Vérifiez les mentions
+  obligatoires de votre pays avant usage officiel.
+
+
+--------------------------------------------------
+SUPPORT
+--------------------------------------------------
+Un problème, une question ? Contactez le vendeur via la plateforme
+d'achat, avec votre reçu.
+
+Bonnes ventes !

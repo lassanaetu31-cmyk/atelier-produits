@@ -1,0 +1,35 @@
+CONDITIONS D'UTILISATION — INVOICE GENERATOR
+=============================================
+
+1. LICENCE
+Votre achat vous donne une licence d'utilisation personnelle ou
+professionnelle du logiciel Invoice Generator. La clé de licence
+fournie vous est propre.
+
+2. RESTRICTIONS
+Il est interdit de revendre, redistribuer, partager, publier ou
+mettre à disposition de tiers le logiciel et/ou votre clé de licence,
+sauf accord écrit de l'auteur. Une licence "agence / multi-postes"
+distincte est disponible si vous devez équiper plusieurs entreprises.
+
+3. PROPRIÉTÉ
+Le code et les modèles restent la propriété de l'auteur. La licence
+ne transfère aucun droit de propriété intellectuelle.
+
+4. DONNÉES
+Le logiciel fonctionne hors-ligne et stocke les données localement sur
+votre appareil. L'auteur n'a aucun accès à vos données et ne peut donc
+pas les récupérer. La sauvegarde régulière est de votre responsabilité.
+
+5. GARANTIE / RESPONSABILITÉ
+Le logiciel est fourni "en l'état". Les documents générés ne sont pas
+garantis conformes à une réglementation fiscale ou légale particulière.
+Il vous appartient de vérifier les mentions obligatoires applicables
+dans votre pays. L'auteur ne pourra être tenu responsable d'un usage
+non conforme ou d'une perte de données.
+
+6. MISES À JOUR & SUPPORT
+Les correctifs éventuels sont communiqués via la plateforme d'achat.
+Le support se fait via la plateforme, sur présentation du reçu.
+
+En utilisant ce logiciel, vous acceptez ces conditions.
