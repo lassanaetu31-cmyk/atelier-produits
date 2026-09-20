@@ -3,6 +3,7 @@ import EditorView from "./components/EditorView";
 import ClientsView from "./components/ClientsView";
 import HistoryView from "./components/HistoryView";
 import ProfileView from "./components/ProfileView";
+import { useLicense } from "./license-context";
 import type { SavedDocument } from "./types";
 
 type Tab = "editor" | "clients" | "history" | "profile";
@@ -15,6 +16,7 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export default function App() {
+  const { license, deactivate } = useLicense();
   const [tab, setTab] = useState<Tab>("editor");
   const [loaded, setLoaded] = useState<SavedDocument | null>(null);
   // Clé de remontage: force EditorView à se réinitialiser sur "Nouveau" ou "Ouvrir".
@@ -40,12 +42,24 @@ export default function App() {
             <h1 className="text-xl font-bold text-blue-600">Invoice Generator</h1>
             <p className="text-sm text-slate-500">Atelier Produits · app #1</p>
           </div>
-          <button
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-            onClick={newDocument}
-          >
-            + Nouveau
-          </button>
+          <div className="flex items-center gap-3">
+            {license && (
+              <span className="flex items-center gap-2 text-xs text-slate-400">
+                <span className="rounded-full bg-green-100 px-2 py-0.5 font-medium text-green-700">
+                  Licence {license.plan}
+                </span>
+                <button className="hover:underline" onClick={deactivate} title="Déconnecter la licence">
+                  Déconnecter
+                </button>
+              </span>
+            )}
+            <button
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              onClick={newDocument}
+            >
+              + Nouveau
+            </button>
+          </div>
         </div>
         <nav className="mx-auto mt-4 flex max-w-3xl gap-1">
           {TABS.map((t) => (

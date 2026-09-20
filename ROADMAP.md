@@ -27,7 +27,7 @@ SOCLE COMMUN (packages/core) — build 1 fois
 
 | # | App | Statut | Diff | Prix Afrique | Prix Int'l | Modules socle réutilisés |
 |---|-----|--------|------|--------------|-----------|--------------------------|
-| 1 | **Invoice + Quote Generator** ⭐ PRIORITÉ | 🔨 en cours | 5 | 12–35k FCFA | $19–59 | PDF, Money, Storage, Licence |
+| 1 | **Invoice + Quote Generator** ⭐ PRIORITÉ | ✅ MVP vendable | 5 | 12–35k FCFA | $19–59 | PDF, Money, Storage, Licence |
 | 2 | WhatsApp Catalog Builder | ⏳ | 5 | 7,5–25k | $19–49 | PDF, WhatsApp, Storage |
 | 3 | Proposal Generator | ⏳ | 5 | 10–30k | $19–69 | PDF, Money, Storage |
 | 4 | Inventory + Profit Calculator | ⏳ | 4 | 15–35k | $15–49 | Money, Export, Storage |
@@ -78,6 +78,13 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 
 ---
 
+## Licence — avant de vendre (important)
+
+- Licence **v1 = HMAC offline** (clé signée, vérifiée sans serveur). Génération vendeur : `npm run genkey -- invoice-generator "Nom Acheteur" pro 0`.
+- ⚠️ **Changer le secret** avant la 1ʳᵉ vente : définir `ATELIER_LICENSE_SECRET` (tool) ET la même valeur dans `packages/core/src/license.ts`. Sinon des clés génériques circulent.
+- Limite v1 : le secret est présent dans le bundle client → un acheteur avancé peut forger une clé. Acceptable pour lancer (livraison manuelle de clé sur Chariow/Lemon Squeezy). **v2** = signature asymétrique (Ed25519, clé privée hors bundle) ou validation serveur.
+- L'outil `tools/genkey.mjs` ne doit **jamais** être livré aux acheteurs.
+
 ## Journal
 
 - 2026-09-20 — Setup monorepo + socle `core` + scaffold app Invoice (priorité #1).
@@ -85,3 +92,4 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 - 2026-09-20 — Invoice point 2 : types de document (Facture/Devis/Reçu/Proposition), numérotation par préfixe, conversion Devis → Facture (éditeur + historique) avec lien source/converti.
 - 2026-09-20 — Invoice point 3 : profil entreprise persistant (logo, infos, couleur d'accent, notes) via onglet Profil, réutilisé en en-tête de chaque PDF ; détection format image (PNG/JPEG) dans le socle.
 - 2026-09-20 — Invoice point 4 : numérotation séquentielle atomique par type+année (F-2026-0001) via store counters (Dexie v3, transaction rw), attribution à l'enregistrement ; remise (%) + livraison exposées dans l'éditeur et le total.
+- 2026-09-20 — Invoice point 5 : écran de licence au démarrage (LicenseGate + contexte), activation par clé, badge plan + déconnexion ; outil vendeur `tools/genkey.mjs` (HMAC, cross-compat WebCrypto vérifiée). **MVP Invoice vendable.**
