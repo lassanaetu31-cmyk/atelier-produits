@@ -28,7 +28,7 @@ SOCLE COMMUN (packages/core) — build 1 fois
 | # | App | Statut | Diff | Prix Afrique | Prix Int'l | Modules socle réutilisés |
 |---|-----|--------|------|--------------|-----------|--------------------------|
 | 1 | **Invoice + Quote Generator** ⭐ PRIORITÉ | ✅ MVP vendable | 5 | 12–35k FCFA | $19–59 | PDF, Money, Storage, Licence |
-| 2 | WhatsApp Catalog Builder | 🔨 en cours | 5 | 7,5–25k | $19–49 | PDF, WhatsApp, Storage |
+| 2 | WhatsApp Catalog Builder | ✅ MVP vendable | 5 | 7,5–25k | $19–49 | PDF, WhatsApp, Storage |
 | 3 | Proposal Generator | ⏳ | 5 | 10–30k | $19–69 | PDF, Money, Storage |
 | 4 | Inventory + Profit Calculator | ⏳ | 4 | 15–35k | $15–49 | Money, Export, Storage |
 | 5 | Link-in-Bio Business Builder | ⏳ | 6 | 10–25k | $19–79 | WhatsApp, Storage |
@@ -110,3 +110,4 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 - 2026-09-20 — Catalog point 2 : onglet Produits (CRUD complet : photo compressée, prix, catégorie, référence, description, disponibilité) en grille. Nouveau `resizeImageDataUrl` dans le socle (canvas, JPEG) réutilisable.
 - 2026-09-20 — Catalog point 3 : catalogue PDF (nouveau `buildCatalogPdf` dans le socle — grille 2 colonnes, en-tête logo/couleur, QR WhatsApp) + onglet Catalogue (génération, résumé produits/devise/WhatsApp). Invoice reste OK après modif du socle.
 - 2026-09-20 — Catalog point 4 : commande WhatsApp par produit (bouton lien prérempli `{produit}`/`{prix}` + téléchargement QR PNG par produit) dans l'onglet Produits.
+- 2026-09-20 — Catalog **packaging (point 5)** : docs acheteur (`release-assets/catalog/`), pages produit Chariow + Lemon Squeezy + notes vendeur (`marketing/`), script `tools/pack-catalog.ps1` → `release/Catalog-Builder.zip` (~360 Ko). Clé de test `catalog-builder` OK. **MVP Catalog vendable.**

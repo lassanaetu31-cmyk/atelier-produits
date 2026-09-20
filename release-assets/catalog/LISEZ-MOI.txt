@@ -1,0 +1,72 @@
+==================================================
+ CATALOG BUILDER — Votre catalogue produits + WhatsApp
+==================================================
+
+Merci pour votre achat !
+
+Ce logiciel fonctionne HORS-LIGNE, directement dans votre navigateur.
+Aucune installation, aucun compte. Vos données restent sur VOTRE appareil.
+
+
+--------------------------------------------------
+1) OUVRIR LE LOGICIEL
+--------------------------------------------------
+- Double-cliquez sur le fichier :  Catalog-Builder.html
+- Ouvrez-le de préférence avec GOOGLE CHROME ou MICROSOFT EDGE.
+  (Sur téléphone : ouvrez le fichier avec Chrome.)
+
+IMPORTANT : ne déplacez pas le fichier après l'avoir ouvert la première
+fois et n'effacez pas les données du site, sinon vos produits enregistrés
+seront perdus (voir Sauvegarde).
+
+
+--------------------------------------------------
+2) ACTIVER VOTRE LICENCE
+--------------------------------------------------
+- Au premier lancement, collez la CLÉ DE LICENCE reçue avec votre achat.
+- Cliquez sur "Activer".
+- Pas reçu de clé ? Répondez au message d'achat avec votre reçu.
+
+
+--------------------------------------------------
+3) UTILISATION
+--------------------------------------------------
+- Onglet PROFIL :
+    * nom de la boutique, logo, couleur,
+    * NUMÉRO WHATSAPP (indispensable pour les boutons de commande),
+    * devise,
+    * modèle de message de commande (variables {produit} et {prix}).
+- Onglet PRODUITS :
+    * ajoutez vos articles (photo, nom, prix, catégorie, description),
+    * les photos sont automatiquement compressées,
+    * chaque produit dispose d'un bouton "Commander" (WhatsApp prérempli)
+      et d'un bouton "QR" (à imprimer / afficher en boutique).
+- Onglet CATALOGUE :
+    * "Générer le catalogue PDF" crée un beau catalogue en grille,
+      avec votre logo, vos couleurs et un QR de commande WhatsApp.
+
+
+--------------------------------------------------
+4) SAUVEGARDE (À FAIRE RÉGULIÈREMENT)
+--------------------------------------------------
+- Onglet PROFIL > "Exporter une sauvegarde" : enregistre un fichier .json.
+- Gardez-le en lieu sûr (USB, email, cloud).
+- Pour récupérer vos données : PROFIL > "Restaurer une sauvegarde".
+
+
+--------------------------------------------------
+5) BON À SAVOIR
+--------------------------------------------------
+- Le logiciel n'envoie aucune donnée sur Internet.
+- Le bouton "Commander" ouvre WhatsApp avec un message prérempli ; il
+  n'envoie pas le message automatiquement (l'envoi automatique nécessite
+  l'API officielle WhatsApp Business).
+
+
+--------------------------------------------------
+SUPPORT
+--------------------------------------------------
+Une question ? Contactez le vendeur via la plateforme d'achat, avec
+votre reçu.
+
+Bonnes ventes !
