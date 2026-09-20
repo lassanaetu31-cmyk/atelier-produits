@@ -81,3 +81,4 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 ## Journal
 
 - 2026-09-20 — Setup monorepo + socle `core` + scaffold app Invoice (priorité #1).
+- 2026-09-20 — Invoice point 1 : clients (CRUD) + historique persistant (Dexie), navigation Éditeur/Clients/Historique, ouvrir/rejouer/PDF depuis l'historique.
