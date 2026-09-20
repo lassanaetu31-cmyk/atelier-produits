@@ -116,6 +116,25 @@ try {
     await page.getByText("Sac en cuir").first().waitFor({ timeout: 8000 });
     log(true, "produit ajouté (photo optionnelle)");
 
+    // Import CSV de produits
+    const pcsv =
+      "nom,prix,categorie,disponible\nMontre classique,45000,Montres,oui\nCeinture,8000,Accessoires,non\n";
+    await page
+      .locator('input[type="file"][accept=".csv,text/csv"]')
+      .setInputFiles({ name: "produits.csv", mimeType: "text/csv", buffer: Buffer.from(pcsv) });
+    const pImported = await page
+      .getByText(/produit\(s\) import/)
+      .waitFor({ timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    const montre = await page
+      .getByText("Montre classique")
+      .first()
+      .waitFor({ timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    log(pImported && montre, "import CSV produits (2 produits créés automatiquement)");
+
     await page.getByRole("button", { name: "Catalogue" }).click();
     const [dl] = await Promise.all([
       page.waitForEvent("download", { timeout: 20000 }),

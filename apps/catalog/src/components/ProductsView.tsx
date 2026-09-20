@@ -3,6 +3,12 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { formatMoney, resizeImageDataUrl } from "@atelier/core";
 import { db } from "../db";
 import { downloadProductQr, productWaLink } from "../catalog";
+import {
+  addProducts,
+  downloadCsvTemplate,
+  exportProductsCsv,
+  parseCsvProducts,
+} from "../products-import";
 import { useProfile } from "../profile";
 import type { Product } from "../types";
 
@@ -21,9 +27,31 @@ export default function ProductsView() {
   const [form, setForm] = useState<Omit<Product, "createdAt"> & { id?: number }>(EMPTY);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [msg, setMsg] = useState("");
 
   function patch(p: Partial<typeof form>) {
     setForm((f) => ({ ...f, ...p }));
+  }
+
+  async function onImportCsv(file?: File) {
+    if (!file) return;
+    setMsg("");
+    try {
+      const list = parseCsvProducts(await file.text());
+      if (list.length === 0) {
+        setMsg("Aucun produit trouvé dans le fichier.");
+        return;
+      }
+      const { added, skipped } = await addProducts(list);
+      setMsg(`${added} produit(s) importé(s)${skipped ? `, ${skipped} ignoré(s) (doublons/vides)` : ""}.`);
+    } catch {
+      setMsg("Fichier illisible. Utilisez un CSV (nom, prix, catégorie…).");
+    }
+  }
+
+  async function onExportCsv() {
+    const n = await exportProductsCsv();
+    setMsg(n === 0 ? "Aucun produit à exporter." : `${n} produit(s) exporté(s).`);
   }
 
   async function onImage(file?: File) {
@@ -53,6 +81,38 @@ export default function ProductsView() {
 
   return (
     <div className="grid gap-6">
+      <section className="grid gap-3 rounded-xl border bg-white p-5">
+        <h2 className="font-semibold">Importer des produits</h2>
+        <p className="-mt-1 text-xs text-slate-400">
+          Fichier CSV (nom, prix, catégorie, référence, description, disponible). Les produits sont
+          créés automatiquement, sans doublons. Les photos s'ajoutent ensuite produit par produit.
+        </p>
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <label className="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700">
+            Importer CSV
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              onChange={(e) => {
+                onImportCsv(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </label>
+          <button
+            className="rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50"
+            onClick={onExportCsv}
+          >
+            Exporter CSV
+          </button>
+          <button className="text-slate-500 hover:underline" onClick={downloadCsvTemplate}>
+            Télécharger un modèle CSV
+          </button>
+        </div>
+        {msg && <p className="text-sm font-medium text-green-600">{msg}</p>}
+      </section>
+
       <section className="grid gap-3 rounded-xl border bg-white p-5">
         <h2 className="font-semibold">{form.id ? "Modifier le produit" : "Nouveau produit"}</h2>
 

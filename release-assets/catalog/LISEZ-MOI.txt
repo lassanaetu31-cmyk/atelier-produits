@@ -38,6 +38,9 @@ seront perdus (voir Sauvegarde).
     * modèle de message de commande (variables {produit} et {prix}).
 - Onglet PRODUITS :
     * ajoutez vos articles (photo, nom, prix, catégorie, description),
+    * import en masse : bouton "Importer CSV" (nom, prix, catégorie,
+      référence, description, disponible) — les produits sont créés
+      automatiquement, sans doublons. "Modèle CSV" donne un exemple.
     * les photos sont automatiquement compressées,
     * chaque produit dispose d'un bouton "Commander" (WhatsApp prérempli)
       et d'un bouton "QR" (à imprimer / afficher en boutique).
