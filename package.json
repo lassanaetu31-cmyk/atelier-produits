@@ -11,6 +11,10 @@
     "build:invoice": "npm run build --workspace apps/invoice",
     "dev:catalog": "npm run dev --workspace apps/catalog",
     "build:catalog": "npm run build --workspace apps/catalog",
-    "genkey": "node tools/genkey.mjs"
+    "genkey": "node tools/genkey.mjs",
+    "test:e2e": "node tools/e2e-test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
   }
 }
