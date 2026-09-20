@@ -107,3 +107,4 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 - 2026-09-20 — Sécurisation licence : secret de production HMAC dans `license.ts` + `genkey.mjs`.
 - 2026-09-20 — App #2 Catalog Builder : **fondation** (workspace, licence gate produit `catalog-builder`, db products/settings, profil boutique, shell 3 onglets). Build fichier unique OK.
 - 2026-09-20 — Catalog point 1 : onglet Profil boutique (logo, couleur, n° WhatsApp, devise, modèle de message de commande avec aperçu + test lien WhatsApp) + sauvegarde/restauration (backup.ts). Réutilise `whatsappLink`/`formatMoney` du socle.
+- 2026-09-20 — Catalog point 2 : onglet Produits (CRUD complet : photo compressée, prix, catégorie, référence, description, disponibilité) en grille. Nouveau `resizeImageDataUrl` dans le socle (canvas, JPEG) réutilisable.

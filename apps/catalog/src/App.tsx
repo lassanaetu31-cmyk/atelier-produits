@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ProductsView from "./components/ProductsView";
 import ProfileView from "./components/ProfileView";
 import { useProfile } from "./profile";
 import { useLicense } from "./license-context";
@@ -59,7 +60,7 @@ export default function App() {
       </header>
 
       <main className="mx-auto max-w-4xl p-6">
-        {tab === "products" && <Placeholder title="Gestion des produits" />}
+        {tab === "products" && <ProductsView />}
         {tab === "catalog" && <Placeholder title="Catalogue PDF + WhatsApp" />}
         {tab === "profile" && <ProfileView />}
       </main>
