@@ -56,6 +56,26 @@ try {
       `PDF généré : ${dl.suggestedFilename()} (${size} octets)`,
     );
 
+    // Import CSV de clients
+    await page.getByRole("button", { name: "Clients" }).click();
+    const csv =
+      "nom,telephone,email,adresse\nAwa Diallo,771234567,awa@mail.com,Dakar\nModou Kane,770000000,,Thies\n";
+    await page
+      .locator('input[type="file"][accept*="vcf"]')
+      .setInputFiles({ name: "clients.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+    const imported = await page
+      .getByText(/client\(s\) import/)
+      .waitFor({ timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    const awa = await page
+      .getByText("Awa Diallo")
+      .first()
+      .waitFor({ timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    log(imported && awa, "import CSV clients (2 contacts créés automatiquement)");
+
     // Rejet d'une mauvaise clé (nouvel onglet vierge)
     const ctx2 = await browser.newContext();
     const page2 = await ctx2.newPage();

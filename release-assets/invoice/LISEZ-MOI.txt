@@ -36,6 +36,10 @@ sinon vos factures enregistrées seront perdues (voir Sauvegarde).
 - Onglet PROFIL : renseignez votre entreprise (nom, logo, couleur,
   coordonnées, notes de bas de page). Ces infos apparaissent sur chaque PDF.
 - Onglet CLIENTS : enregistrez vos clients pour aller plus vite.
+    * Import en masse : bouton "Importer CSV / contacts" — chargez un
+      fichier CSV (nom, téléphone, email, adresse) OU un fichier de
+      contacts .vcf exporté depuis votre téléphone. Les clients sont
+      créés automatiquement, sans doublons. "Modèle CSV" donne un exemple.
 - Onglet ÉDITEUR :
     * choisissez le type (Facture, Devis, Reçu, Proposition),
     * ajoutez vos lignes (description, quantité, prix),

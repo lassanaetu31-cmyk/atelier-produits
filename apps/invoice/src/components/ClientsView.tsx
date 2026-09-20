@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../db";
+import {
+  addContacts,
+  downloadCsvTemplate,
+  exportClientsCsv,
+  parseCsvClients,
+  parseVcfClients,
+} from "../clients-import";
 import type { Client } from "../types";
 
 const EMPTY: Omit<Client, "createdAt"> = { name: "", phone: "", email: "", address: "" };
@@ -8,6 +15,7 @@ const EMPTY: Omit<Client, "createdAt"> = { name: "", phone: "", email: "", addre
 export default function ClientsView() {
   const clients = useLiveQuery(() => db.clients.orderBy("name").toArray(), [], []);
   const [form, setForm] = useState<Omit<Client, "createdAt">>(EMPTY);
+  const [msg, setMsg] = useState("");
 
   async function submit() {
     if (!form.name.trim()) return;
@@ -19,8 +27,63 @@ export default function ClientsView() {
     setForm(EMPTY);
   }
 
+  async function onImport(file?: File) {
+    if (!file) return;
+    setMsg("");
+    try {
+      const text = await file.text();
+      const isVcf = /\.vcf$/i.test(file.name) || text.toUpperCase().includes("BEGIN:VCARD");
+      const contacts = isVcf ? parseVcfClients(text) : parseCsvClients(text);
+      if (contacts.length === 0) {
+        setMsg("Aucun contact trouvé dans le fichier.");
+        return;
+      }
+      const { added, skipped } = await addContacts(contacts);
+      setMsg(`${added} client(s) importé(s)${skipped ? `, ${skipped} ignoré(s) (doublons/vides)` : ""}.`);
+    } catch {
+      setMsg("Fichier illisible. Utilisez un CSV ou un fichier de contacts .vcf.");
+    }
+  }
+
+  async function onExport() {
+    const n = await exportClientsCsv();
+    setMsg(n === 0 ? "Aucun client à exporter." : `${n} client(s) exporté(s).`);
+  }
+
   return (
     <div className="grid gap-6">
+      <section className="grid gap-3 rounded-xl border bg-white p-5">
+        <h2 className="font-semibold">Importer des clients</h2>
+        <p className="-mt-1 text-xs text-slate-400">
+          Fichier CSV (nom, téléphone, email, adresse) ou fichier de contacts .vcf exporté depuis
+          votre téléphone. Les clients sont créés automatiquement, sans doublons.
+        </p>
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <label className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700">
+            Importer CSV / contacts
+            <input
+              type="file"
+              accept=".csv,.vcf,text/csv,text/vcard,text/x-vcard"
+              className="hidden"
+              onChange={(e) => {
+                onImport(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </label>
+          <button
+            className="rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50"
+            onClick={onExport}
+          >
+            Exporter CSV
+          </button>
+          <button className="text-slate-500 hover:underline" onClick={downloadCsvTemplate}>
+            Télécharger un modèle CSV
+          </button>
+        </div>
+        {msg && <p className="text-sm font-medium text-green-600">{msg}</p>}
+      </section>
+
       <section className="grid gap-3 rounded-xl border bg-white p-5">
         <h2 className="font-semibold">{form.id ? "Modifier le client" : "Nouveau client"}</h2>
         <div className="grid grid-cols-2 gap-3">
