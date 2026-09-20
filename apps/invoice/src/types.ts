@@ -27,4 +27,8 @@ export interface SavedDocument {
   total: number;
   date: string;
   createdAt: number;
+  /** Si ce document est une facture issue d'un devis : id du devis source. */
+  sourceId?: number;
+  /** Si ce devis a été converti : id de la facture générée. */
+  convertedToId?: number;
 }

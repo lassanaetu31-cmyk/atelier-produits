@@ -62,7 +62,12 @@ export default function App() {
 
       <main className="mx-auto max-w-3xl p-6">
         {tab === "editor" && (
-          <EditorView key={editorKey} initial={loaded} onSaved={() => setTab("history")} />
+          <EditorView
+            key={editorKey}
+            initial={loaded}
+            onSaved={() => setTab("history")}
+            onOpen={openDocument}
+          />
         )}
         {tab === "clients" && <ClientsView />}
         {tab === "history" && <HistoryView onOpen={openDocument} />}

@@ -2,14 +2,15 @@ import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { formatMoney, type Currency, type LineItem } from "@atelier/core";
 import { db } from "../db";
-import { downloadPdf, totalsOf } from "../invoice";
-import type { SavedDocument } from "../types";
+import { convertToInvoice, downloadPdf, makeNumber, totalsOf } from "../invoice";
+import type { DocKind, SavedDocument } from "../types";
 
 const CURRENCY: Currency = "XOF";
+const KINDS: DocKind[] = ["Facture", "Devis", "Reçu", "Proposition"];
 
 function blankDraft(): SavedDocument {
   return {
-    number: `F-${Date.now().toString().slice(-6)}`,
+    number: makeNumber("Facture"),
     kind: "Facture",
     clientName: "",
     fromName: "Ma Boutique",
@@ -27,9 +28,11 @@ function blankDraft(): SavedDocument {
 export default function EditorView({
   initial,
   onSaved,
+  onOpen,
 }: {
   initial: SavedDocument | null;
   onSaved: () => void;
+  onOpen: (doc: SavedDocument) => void;
 }) {
   const clients = useLiveQuery(() => db.clients.orderBy("name").toArray(), [], []);
   const [draft, setDraft] = useState<SavedDocument>(initial ?? blankDraft());
@@ -39,6 +42,16 @@ export default function EditorView({
 
   function patch(p: Partial<SavedDocument>) {
     setDraft((d) => ({ ...d, ...p }));
+  }
+
+  function changeKind(kind: DocKind) {
+    // Nouveau document : on aligne le numéro sur le type. Document existant : on garde le numéro.
+    setDraft((d) => ({ ...d, kind, number: d.id ? d.number : makeNumber(kind) }));
+  }
+
+  async function convert() {
+    const invoice = await convertToInvoice({ ...draft, total: totals.total });
+    onOpen(invoice);
   }
   function updateItem(i: number, p: Partial<LineItem>) {
     setDraft((d) => ({ ...d, items: d.items.map((it, idx) => (idx === i ? { ...it, ...p } : it)) }));
@@ -75,6 +88,42 @@ export default function EditorView({
   return (
     <div className="grid gap-6">
       <section className="grid gap-4 rounded-xl border bg-white p-5">
+        <div className="grid grid-cols-2 gap-4">
+          <label className="text-sm">
+            Type de document
+            <select
+              className="mt-1 w-full rounded border bg-white px-3 py-2"
+              value={draft.kind}
+              onChange={(e) => changeKind(e.target.value as DocKind)}
+            >
+              {KINDS.map((k) => (
+                <option key={k} value={k}>
+                  {k}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm">
+            Numéro
+            <input
+              className="mt-1 w-full rounded border px-3 py-2"
+              value={draft.number}
+              onChange={(e) => patch({ number: e.target.value })}
+            />
+          </label>
+        </div>
+
+        {draft.kind === "Devis" && draft.convertedToId && (
+          <p className="rounded bg-amber-50 px-3 py-2 text-xs text-amber-700">
+            Ce devis a déjà été converti en facture.
+          </p>
+        )}
+        {draft.sourceId && (
+          <p className="rounded bg-blue-50 px-3 py-2 text-xs text-blue-700">
+            Facture issue d'un devis.
+          </p>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <label className="text-sm">
             Émetteur
@@ -184,6 +233,14 @@ export default function EditorView({
         >
           Enregistrer dans l'historique
         </button>
+        {draft.kind === "Devis" && draft.id && !draft.convertedToId && (
+          <button
+            className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
+            onClick={convert}
+          >
+            Convertir en facture
+          </button>
+        )}
         {flash && <span className="text-sm font-medium text-green-600">{flash}</span>}
       </div>
     </div>

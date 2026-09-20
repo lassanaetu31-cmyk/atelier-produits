@@ -1,7 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { formatMoney } from "@atelier/core";
 import { db } from "../db";
-import { downloadPdf } from "../invoice";
+import { convertToInvoice, downloadPdf } from "../invoice";
 import type { SavedDocument } from "../types";
 
 export default function HistoryView({ onOpen }: { onOpen: (doc: SavedDocument) => void }) {
@@ -33,12 +33,23 @@ export default function HistoryView({ onOpen }: { onOpen: (doc: SavedDocument) =
                 </p>
                 <p className="text-xs text-slate-400">
                   {d.date} · {formatMoney(d.total, d.currency)}
+                  {d.kind === "Devis" && d.convertedToId && (
+                    <span className="ml-2 text-green-600">converti ✓</span>
+                  )}
                 </p>
               </div>
               <div className="flex gap-3 text-sm">
                 <button className="text-blue-600 hover:underline" onClick={() => onOpen(d)}>
                   Ouvrir
                 </button>
+                {d.kind === "Devis" && !d.convertedToId && (
+                  <button
+                    className="text-green-600 hover:underline"
+                    onClick={async () => onOpen(await convertToInvoice(d))}
+                  >
+                    → Facture
+                  </button>
+                )}
                 <button className="text-slate-600 hover:underline" onClick={() => downloadPdf(d)}>
                   PDF
                 </button>

@@ -82,3 +82,4 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 
 - 2026-09-20 — Setup monorepo + socle `core` + scaffold app Invoice (priorité #1).
 - 2026-09-20 — Invoice point 1 : clients (CRUD) + historique persistant (Dexie), navigation Éditeur/Clients/Historique, ouvrir/rejouer/PDF depuis l'historique.
+- 2026-09-20 — Invoice point 2 : types de document (Facture/Devis/Reçu/Proposition), numérotation par préfixe, conversion Devis → Facture (éditeur + historique) avec lien source/converti.
