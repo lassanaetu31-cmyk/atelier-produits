@@ -28,7 +28,7 @@ SOCLE COMMUN (packages/core) — build 1 fois
 | # | App | Statut | Diff | Prix Afrique | Prix Int'l | Modules socle réutilisés |
 |---|-----|--------|------|--------------|-----------|--------------------------|
 | 1 | **Invoice + Quote Generator** ⭐ PRIORITÉ | ✅ MVP vendable | 5 | 12–35k FCFA | $19–59 | PDF, Money, Storage, Licence |
-| 2 | WhatsApp Catalog Builder | ⏳ | 5 | 7,5–25k | $19–49 | PDF, WhatsApp, Storage |
+| 2 | WhatsApp Catalog Builder | 🔨 en cours | 5 | 7,5–25k | $19–49 | PDF, WhatsApp, Storage |
 | 3 | Proposal Generator | ⏳ | 5 | 10–30k | $19–69 | PDF, Money, Storage |
 | 4 | Inventory + Profit Calculator | ⏳ | 4 | 15–35k | $15–49 | Money, Export, Storage |
 | 5 | Link-in-Bio Business Builder | ⏳ | 6 | 10–25k | $19–79 | WhatsApp, Storage |
@@ -78,6 +78,16 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 
 ---
 
+## App #2 — Catalog Builder : plan MVP (pas à pas)
+
+1. **Profil boutique** — nom, logo, couleur, numéro WhatsApp, modèle de message de commande (onglet Profil) + sauvegarde/restauration.
+2. **Produits** — CRUD (photo compressée, nom, prix, description, catégorie, référence, disponibilité).
+3. **Catalogue PDF** — mise en page grille avec images/prix (nouveau `buildCatalogPdf` dans le socle) + QR du contact WhatsApp.
+4. **Commande WhatsApp** — bouton/lien prérempli par produit (`{produit}`/`{prix}`) + QR par produit.
+5. **Licence** — déjà en place (gate, produit `catalog-builder`). Packaging identique à Invoice.
+
+> Note archi : `LicenseGate` + `license-context` sont dupliqués Invoice/Catalog (petits fichiers). Refactor futur possible : extraire un paquet `packages/ui` React partagé.
+
 ## Licence — avant de vendre (important)
 
 - Licence **v1 = HMAC offline** (clé signée, vérifiée sans serveur). Génération vendeur : `npm run genkey -- invoice-generator "Nom Acheteur" pro 0`.
@@ -94,3 +104,5 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 - 2026-09-20 — Invoice point 4 : numérotation séquentielle atomique par type+année (F-2026-0001) via store counters (Dexie v3, transaction rw), attribution à l'enregistrement ; remise (%) + livraison exposées dans l'éditeur et le total.
 - 2026-09-20 — Invoice point 5 : écran de licence au démarrage (LicenseGate + contexte), activation par clé, badge plan + déconnexion ; outil vendeur `tools/genkey.mjs` (HMAC, cross-compat WebCrypto vérifiée). **MVP Invoice vendable.**
 - 2026-09-20 — Invoice **packaging (option A)** : build fichier unique hors-ligne (`vite-plugin-singlefile`, base relative), sauvegarde/restauration des données (onglet Profil), docs acheteur (`release-assets/invoice/`), pages produit Chariow + Lemon Squeezy + checklist vendeur (`marketing/`), script `tools/pack-invoice.ps1` → `release/Invoice-Generator.zip` (367 Ko).
+- 2026-09-20 — Sécurisation licence : secret de production HMAC dans `license.ts` + `genkey.mjs`.
+- 2026-09-20 — App #2 Catalog Builder : **fondation** (workspace, licence gate produit `catalog-builder`, db products/settings, profil boutique, shell 3 onglets). Build fichier unique OK.

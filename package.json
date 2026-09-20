@@ -9,6 +9,8 @@
   "scripts": {
     "dev:invoice": "npm run dev --workspace apps/invoice",
     "build:invoice": "npm run build --workspace apps/invoice",
+    "dev:catalog": "npm run dev --workspace apps/catalog",
+    "build:catalog": "npm run build --workspace apps/catalog",
     "genkey": "node tools/genkey.mjs"
   }
 }
