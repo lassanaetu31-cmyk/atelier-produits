@@ -106,3 +106,4 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 - 2026-09-20 — Invoice **packaging (option A)** : build fichier unique hors-ligne (`vite-plugin-singlefile`, base relative), sauvegarde/restauration des données (onglet Profil), docs acheteur (`release-assets/invoice/`), pages produit Chariow + Lemon Squeezy + checklist vendeur (`marketing/`), script `tools/pack-invoice.ps1` → `release/Invoice-Generator.zip` (367 Ko).
 - 2026-09-20 — Sécurisation licence : secret de production HMAC dans `license.ts` + `genkey.mjs`.
 - 2026-09-20 — App #2 Catalog Builder : **fondation** (workspace, licence gate produit `catalog-builder`, db products/settings, profil boutique, shell 3 onglets). Build fichier unique OK.
+- 2026-09-20 — Catalog point 1 : onglet Profil boutique (logo, couleur, n° WhatsApp, devise, modèle de message de commande avec aperçu + test lien WhatsApp) + sauvegarde/restauration (backup.ts). Réutilise `whatsappLink`/`formatMoney` du socle.
