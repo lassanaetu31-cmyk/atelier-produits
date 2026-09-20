@@ -23,6 +23,12 @@ export interface Client {
 
 export type DocKind = "Facture" | "Devis" | "Reçu" | "Proposition";
 
+/** Compteur séquentiel par type+année, clé = `${kind}-${year}`. */
+export interface Counter {
+  key: string;
+  value: number;
+}
+
 /** Document persisté dans l'historique (snapshot complet, rejouable). */
 export interface SavedDocument {
   id?: number;

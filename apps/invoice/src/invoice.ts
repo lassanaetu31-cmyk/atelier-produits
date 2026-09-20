@@ -9,9 +9,20 @@ const PREFIX: Record<DocKind, string> = {
   Proposition: "P",
 };
 
-/** Numéro provisoire par préfixe (numérotation séquentielle propre = point 4). */
-export function makeNumber(kind: DocKind): string {
-  return `${PREFIX[kind]}-${Date.now().toString().slice(-6)}`;
+/**
+ * Numéro séquentiel atomique par type et par année : ex. F-2026-0001.
+ * La transaction rw garantit l'unicité même en cas d'appels concurrents.
+ */
+export async function nextNumber(kind: DocKind): Promise<string> {
+  const year = new Date().getFullYear();
+  const key = `${kind}-${year}`;
+  let value = 1;
+  await db.transaction("rw", db.counters, async () => {
+    const row = await db.counters.get(key);
+    value = (row?.value ?? 0) + 1;
+    await db.counters.put({ key, value });
+  });
+  return `${PREFIX[kind]}-${year}-${String(value).padStart(4, "0")}`;
 }
 
 /** Crée une facture à partir d'un devis, la persiste, et marque le devis comme converti. */
@@ -20,7 +31,7 @@ export async function convertToInvoice(devis: SavedDocument): Promise<SavedDocum
     ...devis,
     id: undefined,
     kind: "Facture",
-    number: makeNumber("Facture"),
+    number: await nextNumber("Facture"),
     date: new Date().toLocaleDateString("fr-FR"),
     createdAt: Date.now(),
     sourceId: devis.id,

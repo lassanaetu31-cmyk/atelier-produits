@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { formatMoney, type Currency, type LineItem } from "@atelier/core";
 import { db } from "../db";
-import { convertToInvoice, downloadPdf, makeNumber, totalsOf } from "../invoice";
+import { convertToInvoice, downloadPdf, nextNumber, totalsOf } from "../invoice";
 import { useProfile } from "../profile";
 import type { DocKind, SavedDocument } from "../types";
 
@@ -11,10 +11,10 @@ const KINDS: DocKind[] = ["Facture", "Devis", "Reçu", "Proposition"];
 
 function blankDraft(): SavedDocument {
   return {
-    number: makeNumber("Facture"),
+    number: "", // attribué automatiquement à l'enregistrement
     kind: "Facture",
     clientName: "",
-    fromName: "Ma Boutique",
+    fromName: "",
     currency: CURRENCY,
     items: [{ description: "Produit / service", quantity: 1, unitPrice: 10000 }],
     taxRate: 0,
@@ -47,13 +47,26 @@ export default function EditorView({
   }
 
   function changeKind(kind: DocKind) {
-    // Nouveau document : on aligne le numéro sur le type. Document existant : on garde le numéro.
-    setDraft((d) => ({ ...d, kind, number: d.id ? d.number : makeNumber(kind) }));
+    setDraft((d) => ({ ...d, kind }));
+  }
+
+  /** Persiste le brouillon : attribue un numéro séquentiel si nouveau, sinon met à jour. */
+  async function persist(): Promise<SavedDocument> {
+    let record: SavedDocument = { ...draft, fromName: profile.name, total: totals.total };
+    if (record.id) {
+      await db.documents.put(record);
+    } else {
+      if (!record.number.trim()) record.number = await nextNumber(record.kind);
+      const id = await db.documents.add(record);
+      record = { ...record, id };
+    }
+    setDraft(record);
+    return record;
   }
 
   async function convert() {
-    const invoice = await convertToInvoice({ ...draft, fromName: profile.name, total: totals.total });
-    onOpen(invoice);
+    const saved = await persist();
+    onOpen(await convertToInvoice(saved));
   }
   function updateItem(i: number, p: Partial<LineItem>) {
     setDraft((d) => ({ ...d, items: d.items.map((it, idx) => (idx === i ? { ...it, ...p } : it)) }));
@@ -75,16 +88,15 @@ export default function EditorView({
   }
 
   async function save() {
-    const record: SavedDocument = { ...draft, fromName: profile.name, total: totals.total };
-    if (record.id) {
-      await db.documents.put(record);
-    } else {
-      const id = await db.documents.add(record);
-      setDraft({ ...record, id });
-    }
+    await persist();
     setFlash("Enregistré dans l'historique ✓");
     setTimeout(() => setFlash(""), 2500);
     onSaved();
+  }
+
+  async function pdf() {
+    const saved = await persist();
+    downloadPdf(saved, profile);
   }
 
   return (
@@ -109,11 +121,17 @@ export default function EditorView({
             Numéro
             <input
               className="mt-1 w-full rounded border px-3 py-2"
+              placeholder="Auto à l'enregistrement"
               value={draft.number}
               onChange={(e) => patch({ number: e.target.value })}
             />
           </label>
         </div>
+        {!draft.id && !draft.number.trim() && (
+          <p className="-mt-2 text-xs text-slate-400">
+            Numéro séquentiel attribué automatiquement (ex. F-{new Date().getFullYear()}-0001).
+          </p>
+        )}
 
         {draft.kind === "Devis" && draft.convertedToId && (
           <p className="rounded bg-amber-50 px-3 py-2 text-xs text-amber-700">
@@ -195,22 +213,47 @@ export default function EditorView({
           </button>
         </div>
 
-        <label className="text-sm">
-          Taxe (%)
-          <input
-            className="ml-2 w-20 rounded border px-2 py-1"
-            type="number"
-            min={0}
-            value={draft.taxRate}
-            onChange={(e) => patch({ taxRate: Number(e.target.value) })}
-          />
-        </label>
+        <div className="flex flex-wrap gap-4 text-sm">
+          <label>
+            Remise (%)
+            <input
+              className="ml-2 w-20 rounded border px-2 py-1"
+              type="number"
+              min={0}
+              max={100}
+              value={draft.discountRate}
+              onChange={(e) => patch({ discountRate: Number(e.target.value) })}
+            />
+          </label>
+          <label>
+            Taxe (%)
+            <input
+              className="ml-2 w-20 rounded border px-2 py-1"
+              type="number"
+              min={0}
+              value={draft.taxRate}
+              onChange={(e) => patch({ taxRate: Number(e.target.value) })}
+            />
+          </label>
+          <label>
+            Livraison
+            <input
+              className="ml-2 w-28 rounded border px-2 py-1"
+              type="number"
+              min={0}
+              value={draft.shipping}
+              onChange={(e) => patch({ shipping: Number(e.target.value) })}
+            />
+          </label>
+        </div>
       </section>
 
       <section className="flex items-center justify-between rounded-xl border bg-white p-5">
         <div className="text-sm text-slate-500">
           Sous-total {formatMoney(totals.subtotal, draft.currency)}
+          {totals.discount > 0 && <> · Remise −{formatMoney(totals.discount, draft.currency)}</>}
           {totals.tax > 0 && <> · Taxe {formatMoney(totals.tax, draft.currency)}</>}
+          {totals.shipping > 0 && <> · Livraison {formatMoney(totals.shipping, draft.currency)}</>}
         </div>
         <div className="text-lg font-bold text-blue-600">
           Total {formatMoney(totals.total, draft.currency)}
@@ -220,7 +263,7 @@ export default function EditorView({
       <div className="flex flex-wrap items-center gap-3">
         <button
           className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-          onClick={() => downloadPdf({ ...draft, fromName: profile.name, total: totals.total }, profile)}
+          onClick={pdf}
         >
           Télécharger le PDF
         </button>
