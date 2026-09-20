@@ -2,14 +2,16 @@ import { useState } from "react";
 import EditorView from "./components/EditorView";
 import ClientsView from "./components/ClientsView";
 import HistoryView from "./components/HistoryView";
+import ProfileView from "./components/ProfileView";
 import type { SavedDocument } from "./types";
 
-type Tab = "editor" | "clients" | "history";
+type Tab = "editor" | "clients" | "history" | "profile";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "editor", label: "Éditeur" },
   { id: "clients", label: "Clients" },
   { id: "history", label: "Historique" },
+  { id: "profile", label: "Profil" },
 ];
 
 export default function App() {
@@ -71,6 +73,7 @@ export default function App() {
         )}
         {tab === "clients" && <ClientsView />}
         {tab === "history" && <HistoryView onOpen={openDocument} />}
+        {tab === "profile" && <ProfileView />}
       </main>
     </div>
   );

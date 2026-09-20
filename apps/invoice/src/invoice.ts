@@ -1,6 +1,6 @@
 import { computeTotals, downloadDocumentPdf, type Totals } from "@atelier/core";
 import { db } from "./db";
-import type { DocKind, SavedDocument } from "./types";
+import type { CompanyProfile, DocKind, SavedDocument } from "./types";
 
 const PREFIX: Record<DocKind, string> = {
   Facture: "F",
@@ -40,14 +40,22 @@ export function totalsOf(doc: Pick<SavedDocument, "items" | "taxRate" | "discoun
   });
 }
 
-/** Régénère et télécharge le PDF d'un document sauvegardé (réutilisé par éditeur + historique). */
-export function downloadPdf(doc: SavedDocument): void {
+/** Régénère et télécharge le PDF d'un document. Identité émetteur = profil entreprise. */
+export function downloadPdf(doc: SavedDocument, profile: CompanyProfile): void {
   downloadDocumentPdf({
     kind: doc.kind,
     number: doc.number,
     date: doc.date,
     currency: doc.currency,
-    from: { name: doc.fromName },
+    logoDataUrl: profile.logoDataUrl,
+    accentColor: profile.accentColor,
+    notes: profile.notes,
+    from: {
+      name: doc.fromName || profile.name,
+      address: profile.address,
+      phone: profile.phone,
+      email: profile.email,
+    },
     to: { name: doc.clientName },
     items: doc.items,
     totals: totalsOf(doc),

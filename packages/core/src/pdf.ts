@@ -42,7 +42,8 @@ export function buildDocumentPdf(data: DocumentData): jsPDF {
 
   if (data.logoDataUrl) {
     try {
-      doc.addImage(data.logoDataUrl, "PNG", M, y, 28, 28);
+      const fmt = data.logoDataUrl.includes("image/jpeg") ? "JPEG" : "PNG";
+      doc.addImage(data.logoDataUrl, fmt, M, y, 28, 28);
     } catch {
       /* logo illisible: on ignore */
     }

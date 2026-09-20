@@ -3,6 +3,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { formatMoney, type Currency, type LineItem } from "@atelier/core";
 import { db } from "../db";
 import { convertToInvoice, downloadPdf, makeNumber, totalsOf } from "../invoice";
+import { useProfile } from "../profile";
 import type { DocKind, SavedDocument } from "../types";
 
 const CURRENCY: Currency = "XOF";
@@ -35,6 +36,7 @@ export default function EditorView({
   onOpen: (doc: SavedDocument) => void;
 }) {
   const clients = useLiveQuery(() => db.clients.orderBy("name").toArray(), [], []);
+  const profile = useProfile();
   const [draft, setDraft] = useState<SavedDocument>(initial ?? blankDraft());
   const [flash, setFlash] = useState("");
 
@@ -50,7 +52,7 @@ export default function EditorView({
   }
 
   async function convert() {
-    const invoice = await convertToInvoice({ ...draft, total: totals.total });
+    const invoice = await convertToInvoice({ ...draft, fromName: profile.name, total: totals.total });
     onOpen(invoice);
   }
   function updateItem(i: number, p: Partial<LineItem>) {
@@ -73,7 +75,7 @@ export default function EditorView({
   }
 
   async function save() {
-    const record: SavedDocument = { ...draft, total: totals.total };
+    const record: SavedDocument = { ...draft, fromName: profile.name, total: totals.total };
     if (record.id) {
       await db.documents.put(record);
     } else {
@@ -124,31 +126,26 @@ export default function EditorView({
           </p>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
-          <label className="text-sm">
-            Émetteur
-            <input
-              className="mt-1 w-full rounded border px-3 py-2"
-              value={draft.fromName}
-              onChange={(e) => patch({ fromName: e.target.value })}
-            />
-          </label>
-          <label className="text-sm">
-            Client
-            <select
-              className="mt-1 w-full rounded border bg-white px-3 py-2"
-              value={draft.clientId ?? ""}
-              onChange={(e) => pickClient(e.target.value)}
-            >
-              <option value="">— Saisie libre —</option>
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
+        <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
+          <span className="text-slate-500">Émetteur</span>
+          <span className="font-medium">{profile.name}</span>
         </div>
+
+        <label className="text-sm">
+          Client
+          <select
+            className="mt-1 w-full rounded border bg-white px-3 py-2"
+            value={draft.clientId ?? ""}
+            onChange={(e) => pickClient(e.target.value)}
+          >
+            <option value="">— Saisie libre —</option>
+            {clients.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
 
         {draft.clientId === undefined && (
           <label className="text-sm">
@@ -223,7 +220,7 @@ export default function EditorView({
       <div className="flex flex-wrap items-center gap-3">
         <button
           className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-          onClick={() => downloadPdf({ ...draft, total: totals.total })}
+          onClick={() => downloadPdf({ ...draft, fromName: profile.name, total: totals.total }, profile)}
         >
           Télécharger le PDF
         </button>

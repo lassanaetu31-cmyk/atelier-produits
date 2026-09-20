@@ -2,9 +2,11 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { formatMoney } from "@atelier/core";
 import { db } from "../db";
 import { convertToInvoice, downloadPdf } from "../invoice";
+import { useProfile } from "../profile";
 import type { SavedDocument } from "../types";
 
 export default function HistoryView({ onOpen }: { onOpen: (doc: SavedDocument) => void }) {
+  const profile = useProfile();
   const docs = useLiveQuery(
     () => db.documents.orderBy("createdAt").reverse().toArray(),
     [],
@@ -50,7 +52,10 @@ export default function HistoryView({ onOpen }: { onOpen: (doc: SavedDocument) =
                     → Facture
                   </button>
                 )}
-                <button className="text-slate-600 hover:underline" onClick={() => downloadPdf(d)}>
+                <button
+                  className="text-slate-600 hover:underline"
+                  onClick={() => downloadPdf(d, profile)}
+                >
                   PDF
                 </button>
                 <button

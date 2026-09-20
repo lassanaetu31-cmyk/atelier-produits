@@ -1,5 +1,17 @@
 import type { Currency, LineItem } from "@atelier/core";
 
+/** Profil de l'entreprise (ligne unique id=1). Réutilisé sur chaque PDF. */
+export interface CompanyProfile {
+  id?: number;
+  name: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  logoDataUrl?: string;
+  accentColor: string;
+  notes?: string;
+}
+
 export interface Client {
   id?: number;
   name: string;
