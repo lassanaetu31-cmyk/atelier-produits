@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { formatMoney, resizeImageDataUrl } from "@atelier/core";
 import { db } from "../db";
+import { downloadProductQr, productWaLink } from "../catalog";
 import { useProfile } from "../profile";
 import type { Product } from "../types";
 
@@ -166,6 +167,24 @@ export default function ProductsView() {
                     {p.category || "—"}
                     {!p.available && <span className="ml-1 text-red-400">· indisponible</span>}
                   </p>
+                  {profile.whatsappPhone && (
+                    <div className="mt-2 flex gap-2 text-xs">
+                      <a
+                        className="rounded bg-green-600 px-2 py-1 font-medium text-white hover:bg-green-700"
+                        href={productWaLink(profile, p)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Commander
+                      </a>
+                      <button
+                        className="rounded border border-slate-300 px-2 py-1 font-medium hover:bg-slate-50"
+                        onClick={() => downloadProductQr(profile, p)}
+                      >
+                        QR
+                      </button>
+                    </div>
+                  )}
                   <div className="mt-2 flex gap-3 text-xs">
                     <button className="text-indigo-600 hover:underline" onClick={() => setForm(p)}>
                       Modifier
