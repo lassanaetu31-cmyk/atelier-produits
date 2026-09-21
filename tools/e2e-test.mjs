@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-const SECRET = "NcPaZ77WztD-PZEoLqnh8Q2IHvT5OfKpk8JnfFLS7Ew";
+const SECRET = "p9ykXGFa39nyyjrnAaoA4PJFNL9hAiBNA9jQ97vk0eU";
 const b64url = (buf) =>
   Buffer.from(buf).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 function makeKey(product, buyer = "Test E2E", plan = "pro", expiresAt = 0) {

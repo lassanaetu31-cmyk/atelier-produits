@@ -13,7 +13,7 @@
 import crypto from "node:crypto";
 
 // DOIT rester identique à LICENSE_SECRET dans packages/core/src/license.ts.
-const SECRET = process.env.ATELIER_LICENSE_SECRET || "NcPaZ77WztD-PZEoLqnh8Q2IHvT5OfKpk8JnfFLS7Ew";
+const SECRET = process.env.ATELIER_LICENSE_SECRET || "p9ykXGFa39nyyjrnAaoA4PJFNL9hAiBNA9jQ97vk0eU";
 
 const [, , product = "invoice-generator", buyer = "Client", plan = "pro", days = "0"] =
   process.argv;

@@ -18,7 +18,7 @@ export interface LicenseCheck {
 
 // Secret de licence v1 (HMAC). DOIT être identique à tools/genkey.mjs.
 // Limite v1 : présent dans le bundle client. v2 = signature asymétrique / serveur.
-const LICENSE_SECRET = "NcPaZ77WztD-PZEoLqnh8Q2IHvT5OfKpk8JnfFLS7Ew";
+const LICENSE_SECRET = "p9ykXGFa39nyyjrnAaoA4PJFNL9hAiBNA9jQ97vk0eU";
 
 async function hmac(data: string, secret = LICENSE_SECRET): Promise<string> {
   const enc = new TextEncoder();
