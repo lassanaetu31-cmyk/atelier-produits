@@ -1,65 +1,81 @@
 # Product page — Lemon Squeezy (International / USD)
 
 > Paste into Lemon Squeezy. Product type: Digital download + License key.
-> Add 4–6 screenshots (industry templates, editor, pricing tiers, PDF, signature block).
+> Add 5–6 screenshots: industry template menu, editor with pricing tiers,
+> proposal PDF, Members tab, Forms tab, and the public form on a phone.
 
 ## Title
-**Proposal Generator — Win-ready client proposals in 2 minutes, offline**
+**Proposal Generator — Win-ready proposals, member tracking & online forms (offline)**
 
 ## Tagline
-Stop spending 30 minutes per proposal. Pick an industry template, tweak it,
-and export a pro PDF with pricing tiers, deposit and signature. No install,
-works offline.
+Send proposals that get signed in 2 minutes, track your members / dues, and
+collect sign-ups from a simple link — no install, no subscription, your data
+stays with you.
 
 ## Description
-Freelancer, consultant or agency? Writing proposals is slow, and slow means
-lost deals. **Proposal Generator** gets you a **professional proposal in minutes**:
+Freelancer, consultant, agency, trainer — or running an association / club?
+**Proposal Generator** bundles 3 tools in a single file:
 
-1. Pick an **industry template** (web, design, marketing, consulting, photo) —
-   problem, solution, deliverables, timeline and terms are pre-written.
-2. Tweak the copy, prices and the **itemized quote**.
-3. Add **Essential / Pro / Premium tiers** — clients pick, your average deal grows.
-4. Export a **pro PDF** with your logo, a **deposit** and an **expiry date**.
-5. **Send via WhatsApp** in one click and track **status** (Sent → Accepted).
+**1. Professional proposals in 2 minutes.**
+Pick an industry template (web, design, marketing, HR, real estate, events,
+construction, catering, coaching, accounting, IT, training, photo…): problem,
+solution, deliverables, timeline and terms are pre-written. Tweak the copy
+(5 suggested texts per section), your prices, add **Essential / Pro / Premium
+tiers** to upsell, a **deposit** and an **expiry date**, and export a branded
+**PDF**.
 
-It runs **offline**, in your browser (Chrome/Edge, desktop or mobile).
-**Your data stays on your device.** No subscription.
+**2. Member / dues tracking.**
+Add or import members (CSV), see who's **up to date / overdue**, your
+**collection rate**, search & filter, mark paid in one click, export CSV / PDF / JSON.
+
+**3. Shareable online forms.**
+Build a form (contact sheet, sign-up, interest) and share a **link**: people
+fill it in **without installing anything**, and the response comes back to you
+on WhatsApp, then lands in your dashboard (Inbox tab). Same for **one-tap
+proposal acceptance**.
+
+Runs **offline**, in your browser (Chrome/Edge, desktop or mobile). **Your data
+stays on your device.** No subscription.
 
 ## Features
-- ⚡ Pre-filled industry templates (web/dev, design, marketing, consulting, photo)
-- 📝 Editable sections: problem, solution, deliverables, timeline, terms
+- ⚡ 14 pre-filled industry templates + 5 suggested texts per section
 - 🥇 Three-tier pricing (good-better-best) to upsell
 - 💰 Deposit (%) + validity date (urgency)
 - ✍️ Online acceptance: signed PDF (client name + date)
-- 📲 Prefilled WhatsApp send + status tracking
-- 👥 Clients (CRUD + CSV / .vcf contacts import)
+- 👥 Member / dues tracking: up-to-date / overdue, collection rate
+- 📝 Shareable online forms + dashboard inbox
+- 📲 WhatsApp send & replies (clients install nothing)
 - 🎨 Your logo, brand color, currency (XOF / USD / EUR)
 - 💾 Backup / restore · 📴 100% offline
 
 ## Who is it for?
-Freelancers, consultants, agencies and service providers (web, design,
-marketing, consulting, photo/video, events…).
+Freelancers, consultants, agencies, trainers, service providers — and
+associations, clubs, schools that manage members and sign-ups.
 
 ## Pricing
 | Plan | Price | What's included |
 |------|-------|-----------------|
-| **Lite** | $19 | Software + 1 license |
-| **Freelancer** | $39 | Software + follow-up templates + "Close faster" guide |
-| **Agency** | $69 | Multi-seat use + priority support |
+| **Solo (launch)** | $29 | Software + 1 lifetime license |
+| **Pro** | $49 | Software + follow-up templates + "Close faster" guide |
+| **Agency / Org** | $79 | Multi-seat use + priority support |
 
 ## What you get
-- `Proposal-Generator.html` (the software, single file)
-- Your license key
+- `Proposal-Generator.html` (the software, offline single file)
+- Your lifetime license key
+- Your portal link (for online forms / sign-ups)
 - Getting-started guide (README)
-- (Paid plans) templates and bonuses
+- (Pro/Agency) templates and bonuses
 
 ## FAQ
-**Do I need internet?** No, it works fully offline.
+**Do I need internet?** No, the software works offline. (Client-facing online
+forms use a web link.)
 **Install anything?** No — open the file in Chrome/Edge.
 **Works on mobile?** Yes, open the file with Chrome.
-**Is the signature legally binding?** It's a named acceptance (name + date) printed
-on the PDF — handy for a commercial agreement. For certified e-signature, use a
-dedicated service.
+**Do my clients install anything?** No: they open a link, fill it in, and it
+reaches you on WhatsApp.
+**Is the signature legally binding?** It's a named acceptance (name + date)
+printed on the PDF — handy for a commercial agreement. For certified
+e-signature, use a dedicated service.
 **Where is my data?** Locally on your device. Export a backup regularly.
 
 ## Guarantee

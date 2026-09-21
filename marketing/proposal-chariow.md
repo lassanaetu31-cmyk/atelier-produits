@@ -1,66 +1,83 @@
 # Page produit — Chariow (Afrique francophone / FCFA)
 
-> À copier-coller dans Chariow. Ajoute 4–6 captures (modèles métier, éditeur, formules, PDF, bloc signature).
+> À copier-coller dans Chariow. Ajoute 5–6 captures : menu des modèles métier,
+> éditeur avec formules, PDF de proposition, onglet Adhérents, onglet Formulaire,
+> et le formulaire public (portail) sur téléphone.
 
 ## Titre
-**Proposal Generator — Tes propositions commerciales pro en 2 minutes (hors-ligne)**
+**Proposal Generator — Propositions pro, adhérents & formulaires en ligne (hors-ligne)**
 
 ## Sous-titre / accroche
-Arrête de perdre 30 minutes par devis. Choisis un modèle métier, ajuste,
-et génère une proposition PDF pro (avec formules, acompte et signature).
-Sans Internet, sans installation.
+Fais des propositions commerciales qui font signer en 2 minutes, gère tes
+adhérents/cotisations, et récupère des inscriptions par un simple lien —
+le tout sans installation, sans abonnement, tes données chez toi.
 
 ## Description
-Tu es freelance, consultant ou agence ? Rédiger une proposition prend trop
-de temps et tu perds des clients faute d'envoyer vite. **Proposal Generator**
-te donne une proposition **professionnelle en quelques minutes** :
+Tu es freelance, consultant, agence, formateur, ou tu gères une association /
+un club ? **Proposal Generator** réunit 3 outils en un seul fichier :
 
-1. Choisis un **modèle métier** (site web, design, marketing, conseil, photo) —
-   tout est déjà rédigé (problème, solution, livrables, planning, CGV).
-2. Ajuste le texte, les prix et le **détail chiffré**.
-3. Ajoute des **formules Essentiel / Pro / Premium** : le client choisit,
-   ton panier moyen monte.
-4. Génère le **PDF pro** avec ton logo, ton **acompte** et une **date de validité**.
-5. **Envoie par WhatsApp** en un clic et suis le **statut** (Envoyée → Acceptée).
+**1. Des propositions commerciales pro en 2 minutes.**
+Choisis un modèle métier (site web, design, marketing, RH, immobilier,
+événementiel, BTP, traiteur, coaching, comptabilité, informatique, formation,
+photo…) : tout est déjà rédigé (problème, solution, livrables, planning, CGV).
+Tu ajustes le texte (5 propositions de texte proposées par section), tes prix,
+tu ajoutes des **formules Essentiel / Pro / Premium** pour vendre plus, un
+**acompte** et une **date de validité**. Tu génères un **PDF pro** à ton logo.
+
+**2. Un suivi des adhérents / cotisations.**
+Saisis ou importe tes membres (CSV), suis qui est **à jour / en retard**, ton
+**taux de recouvrement**, recherche et filtres, « marquer payé » en 1 clic,
+export CSV / PDF / JSON.
+
+**3. Des formulaires en ligne partagés par lien.**
+Crée un formulaire (fiche de contact, inscription, intérêt) et partage un
+**lien** : la personne le remplit **sans rien installer**, et sa réponse te
+revient par WhatsApp — puis s'ajoute à ton tableau de bord (onglet Réception).
+Idem pour l'**acceptation d'une proposition en 1 clic**.
 
 Le logiciel marche **hors-ligne**, dans ton navigateur (Chrome/Edge, PC ou
-téléphone). **Tes données restent chez toi.** Aucun abonnement.
+téléphone). **Tes données restent sur ton appareil.** Aucun abonnement.
 
 ## Ce que tu peux faire
-- ⚡ Modèles métier pré-remplis (dev/web, design, marketing, conseil, photo)
-- 📝 Sections éditables : problème, solution, livrables, planning, CGV
-- 🥇 Formules à 3 niveaux (good-better-best) pour vendre plus
+- ⚡ 14 modèles métier pré-remplis + 5 propositions de texte par section
+- 🥇 Formules à 3 niveaux (good-better-best) pour augmenter ton panier
 - 💰 Acompte (%) + date de validité (urgence)
 - ✍️ Acceptation en ligne : PDF signé (nom + date du client)
-- 📲 Envoi WhatsApp prérempli + suivi de statut
-- 👥 Clients (CRUD + import CSV / contacts .vcf)
+- 👥 Adhérents / cotisations : statut à jour / en retard, taux de recouvrement
+- 📝 Formulaires en ligne partageables par lien + réception dans le tableau de bord
+- 📲 Envoi & réponses par WhatsApp (le client ne télécharge rien)
 - 🎨 Ton logo, ta couleur, ta devise (FCFA / USD / EUR)
 - 💾 Sauvegarde / restauration · 📴 100% hors-ligne
 
 ## Pour qui ?
-Freelances, consultants, agences, prestataires de services (web, design,
-marketing, conseil, photo/vidéo, événementiel…).
+Freelances, consultants, agences, formateurs, artisans, prestataires de
+services — **et** associations, clubs, écoles, mutuelles qui gèrent des
+adhérents et des inscriptions.
 
 ## Offres
 | Offre | Prix | Contenu |
 |-------|------|---------|
-| **Proposition** | 10 000 FCFA | Le logiciel + 1 licence |
-| **Pack freelance** | 20 000 FCFA | Logiciel + modèles de relance + guide « Faire signer plus vite » |
-| **Licence agence** | 45 000 FCFA | Utilisation multi-postes + support prioritaire |
+| **Solo (lancement)** | 15 000 FCFA | Le logiciel + 1 licence à vie |
+| **Pro** | 25 000 FCFA | Logiciel + modèles de relance + guide « Faire signer plus vite » |
+| **Agence / Asso** | 45 000 FCFA | Usage multi-postes + support prioritaire |
 
 ## Ce que tu reçois
-- Le fichier `Proposal-Generator.html` (le logiciel)
-- Ta clé de licence
+- Le fichier `Proposal-Generator.html` (le logiciel, hors-ligne)
+- Ta clé de licence à vie
+- Le lien de ton portail (pour les formulaires/inscriptions en ligne)
 - Le guide de démarrage (LISEZ-MOI)
-- (Packs) modèles et bonus
+- (Offres Pro/Agence) modèles et bonus
 
 ## FAQ
-**Faut-il Internet ?** Non, tout marche hors-ligne.
+**Faut-il Internet ?** Non, le logiciel marche hors-ligne. (Les formulaires en
+ligne pour tes clients passent, eux, par un lien web.)
 **Faut-il l'installer ?** Non, on ouvre le fichier avec Chrome/Edge.
-**Ça marche sur téléphone ?** Oui, en ouvrant le fichier avec Chrome.
+**Ça marche sur téléphone ?** Oui, ouvre le fichier avec Chrome.
+**Mes clients doivent-ils installer quelque chose ?** Non : ils ouvrent un lien,
+remplissent, et ça t'arrive par WhatsApp.
 **La signature est-elle légale ?** C'est une acceptation nominative (nom + date)
-inscrite sur le PDF, pratique pour un accord commercial. Pour une signature
-électronique certifiée, utilise un service dédié.
+sur le PDF, pratique pour un accord commercial. Pour une signature électronique
+certifiée, utilise un service dédié.
 **Mes données sont-elles en sécurité ?** Oui, elles restent sur ton appareil.
 Pense à exporter une sauvegarde.
 
