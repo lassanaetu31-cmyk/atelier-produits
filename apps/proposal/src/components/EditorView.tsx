@@ -5,7 +5,7 @@ import { db } from "../db";
 import { downloadPdf, nextNumber, proposalWhatsappLink, totalsOf } from "../proposal";
 import { acceptLink } from "../portal-links";
 import { useProfile } from "../profile";
-import { TEMPLATES } from "../templates";
+import { EXTRA_SECTIONS, TEMPLATES } from "../templates";
 import type { ProposalStatus, SavedProposal } from "../types";
 
 const CURRENCY: Currency = "XOF";
@@ -70,6 +70,11 @@ export default function EditorView({
   }
   function addSection() {
     setDraft((d) => ({ ...d, sections: [...d.sections, { title: "Section", body: "" }] }));
+  }
+  function addSuggestedSection(i: number) {
+    const s = EXTRA_SECTIONS[i];
+    if (!s) return;
+    setDraft((d) => ({ ...d, sections: [...d.sections, { ...s }] }));
   }
   function removeSection(i: number) {
     setDraft((d) => ({ ...d, sections: d.sections.filter((_, idx) => idx !== i) }));
@@ -260,9 +265,26 @@ export default function EditorView({
             />
           </div>
         ))}
-        <button className="justify-self-start text-sm text-blue-600 hover:underline" onClick={addSection}>
-          + Section
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button className="text-sm text-blue-600 hover:underline" onClick={addSection}>
+            + Section vierge
+          </button>
+          <select
+            className="rounded-lg border bg-white px-3 py-2 text-sm"
+            defaultValue=""
+            onChange={(e) => {
+              if (e.target.value !== "") addSuggestedSection(Number(e.target.value));
+              e.target.value = "";
+            }}
+          >
+            <option value="">+ Ajouter une section suggérée…</option>
+            {EXTRA_SECTIONS.map((s, i) => (
+              <option key={s.title} value={i}>
+                {s.title}
+              </option>
+            ))}
+          </select>
+        </div>
       </section>
 
       {/* Formules (paliers tarifaires) */}
