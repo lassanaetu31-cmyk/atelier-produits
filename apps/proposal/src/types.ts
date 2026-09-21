@@ -31,6 +31,37 @@ export interface Counter {
   value: number;
 }
 
+/** Configuration du formulaire en ligne public (singleton id=1). */
+export interface FormConfig {
+  id?: number;
+  title: string;
+  subtitle?: string;
+  /** Cases « ce qui vous intéresse ». */
+  interests: string[];
+  /** Cases « pour mieux vous recontacter ». */
+  recontact: string[];
+  /** Demander structure / organisation + fonction. */
+  askStructure: boolean;
+  consentText: string;
+}
+
+/** Réponse reçue via le formulaire en ligne (onglet Réception). */
+export interface Submission {
+  id?: number;
+  createdAt: number;
+  formTitle?: string;
+  name: string;
+  phone?: string;
+  email?: string;
+  city?: string;
+  structure?: string;
+  fonction?: string;
+  interests: string[];
+  recontact: string[];
+  notes?: string;
+  signature?: string;
+}
+
 /** Adhérent / abonné (module suivi des cotisations). */
 export interface Member {
   id?: number;

@@ -83,6 +83,15 @@ Vos clients n'ont RIEN à installer : ils ouvrent un simple lien.
 - Proposition envoyée par WhatsApp : le message inclut un lien
   "Accepter en 1 clic". Le client accepte → sa réponse vous revient par
   WhatsApp. Aucune donnée ne transite par un serveur.
+- Onglet FORMULAIRE : créez un formulaire en ligne (type fiche de contact /
+  renseignement), personnalisez ses questions, puis partagez le lien. La
+  personne le remplit sans rien installer.
+    * Sa réponse vous arrive par WhatsApp AVEC un lien de réception : en
+      l'ouvrant (ou en le collant dans "Coller une réponse reçue"), la réponse
+      s'ajoute automatiquement à la liste "Réception".
+    * Astuce : pour l'ajout automatique en 1 tap, ouvrez ce logiciel depuis
+      l'adresse web (portail) fournie par le vendeur, pas depuis le fichier.
+    * Exportez toutes les réponses en CSV quand vous voulez.
 
 
 --------------------------------------------------

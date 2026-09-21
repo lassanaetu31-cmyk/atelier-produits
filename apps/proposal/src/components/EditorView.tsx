@@ -5,7 +5,7 @@ import { db } from "../db";
 import { downloadPdf, nextNumber, proposalWhatsappLink, totalsOf } from "../proposal";
 import { acceptLink } from "../portal-links";
 import { useProfile } from "../profile";
-import { EXTRA_SECTIONS, TEMPLATES } from "../templates";
+import { EXTRA_SECTIONS, SECTION_VARIANTS, TEMPLATES } from "../templates";
 import type { ProposalStatus, SavedProposal } from "../types";
 
 const CURRENCY: Currency = "XOF";
@@ -248,6 +248,25 @@ export default function EditorView({
                 value={s.title}
                 onChange={(e) => updateSection(i, { title: e.target.value })}
               />
+              {SECTION_VARIANTS[s.title] && (
+                <select
+                  className="rounded border bg-white px-2 py-1.5 text-xs text-slate-500"
+                  defaultValue=""
+                  title="Choisir un texte proposé"
+                  onChange={(e) => {
+                    const v = Number(e.target.value);
+                    if (!Number.isNaN(v)) updateSection(i, { body: SECTION_VARIANTS[s.title][v] });
+                    e.target.value = "";
+                  }}
+                >
+                  <option value="">Textes proposés…</option>
+                  {SECTION_VARIANTS[s.title].map((t, vi) => (
+                    <option key={vi} value={vi}>
+                      Proposition {vi + 1} — {t.replace(/\n/g, " ").slice(0, 40)}…
+                    </option>
+                  ))}
+                </select>
+              )}
               <button
                 className="rounded bg-red-50 px-2 py-1.5 text-red-500 hover:bg-red-100"
                 onClick={() => removeSection(i)}

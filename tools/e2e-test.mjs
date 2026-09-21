@@ -14,6 +14,9 @@ function makeKey(product, buyer = "Test E2E", plan = "pro", expiresAt = 0) {
   const sig = b64url(crypto.createHmac("sha256", SECRET).update(body).digest());
   return `${body}.${sig}`;
 }
+// base64url d'un objet JSON (comme codec.ts / portail).
+const b64urlJson = (obj) =>
+  Buffer.from(JSON.stringify(obj), "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 
 const root = path.resolve(fileURLToPath(import.meta.url), "..", "..");
 const invoiceHtml = path.join(root, "release", "Invoice-Generator", "Invoice-Generator.html");
@@ -217,6 +220,33 @@ try {
     await ctx.close();
   }
 
+  // ---------------- RÉCEPTION FORMULAIRE (lien #reception dans le dashboard) ----------------
+  {
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    const sub = {
+      createdAt: Date.now(),
+      formTitle: "Fiche test",
+      name: "Fatou Sow",
+      phone: "770000001",
+      interests: ["Cours de cuisine"],
+      recontact: [],
+    };
+    // Ouvre directement le lien de réception, puis active la licence (le hash survit).
+    await page.goto(pathToFileURL(proposalHtml).href + "#reception=" + b64urlJson(sub));
+    await page.getByPlaceholder("Coller la clé de licence").fill(makeKey("proposal-generator"));
+    await page.getByRole("button", { name: "Activer" }).click();
+    await page.getByRole("button", { name: "Formulaire" }).click();
+    const received = await page
+      .getByText("Fatou Sow")
+      .first()
+      .waitFor({ timeout: 6000 })
+      .then(() => true)
+      .catch(() => false);
+    log(received, "réception : réponse importée via le lien (#reception)");
+    await ctx.close();
+  }
+
   // ---------------- PORTAL PUBLIC (client, sans licence) ----------------
   console.log("\n=== Portail public ===");
   {
@@ -260,6 +290,31 @@ try {
     ]);
     const okAccept = waUrl.includes("wa.me/221770000000") && /accepte/i.test(decodeURIComponent(waUrl));
     log(okAccept, "portail : acceptation -> WhatsApp prérempli vers le prestataire");
+
+    // Vue fiche (formulaire en ligne)
+    waUrl = "";
+    const cfg = b64urlJson({
+      title: "Fiche test",
+      interests: ["Cours de cuisine", "Partenariat"],
+      recontact: ["Recevoir des infos"],
+      askStructure: true,
+      consentText: "J'autorise le contact",
+    });
+    await page.goto(
+      `${base}?v=fiche&org=Asso&to=221771112222&app=${encodeURIComponent("https://x.app/")}&cfg=${cfg}`,
+    );
+    await page.getByText("Fiche test").first().waitFor({ timeout: 8000 });
+    await page.getByLabel("Nom / Prénom *").fill("Fatou Sow");
+    await page.getByLabel("Téléphone *").fill("770000001");
+    await page.locator("label", { hasText: "J'autorise le contact" }).getByRole("checkbox").check();
+    await Promise.all([
+      page.waitForURL(/wa\.me/, { timeout: 8000 }),
+      page.getByRole("button", { name: "Envoyer ma fiche" }).click(),
+    ]);
+    const decoded = decodeURIComponent(waUrl);
+    const okFiche =
+      waUrl.includes("wa.me/221771112222") && /Fatou/.test(decoded) && /reception=/.test(decoded);
+    log(okFiche, "portail : fiche -> WhatsApp + lien de réception dashboard");
 
     log(errors.length === 0, `aucune erreur JS${errors.length ? " : " + errors[0] : ""}`);
     await ctx.close();

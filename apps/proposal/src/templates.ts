@@ -538,3 +538,45 @@ export const EXTRA_SECTIONS: ProposalSection[] = [
     body: "Répondez d'avance aux 2-3 objections les plus courantes (délais, prix, propriété des livrables) pour lever les derniers freins.",
   },
 ];
+
+/**
+ * 5 variantes de texte par section standard, piochables dans l'éditeur.
+ * Clé = titre exact de la section. Adaptez ensuite le texte à votre projet.
+ */
+export const SECTION_VARIANTS: Record<string, string[]> = {
+  "Contexte & problème": [
+    "Vous perdez du temps et des opportunités faute d'une solution adaptée à votre situation actuelle.",
+    "Votre organisation fait face à un enjeu qui freine votre croissance et mobilise des ressources précieuses.",
+    "Aujourd'hui, le manque d'outils ou d'expertise en interne vous expose à des erreurs et à une perte d'efficacité.",
+    "Vos clients attendent un niveau de qualité et de réactivité que votre dispositif actuel ne permet pas d'atteindre.",
+    "Le problème n'est pas le manque de volonté, mais l'absence d'un accompagnement structuré pour passer à l'action.",
+  ],
+  "Solution proposée": [
+    "Je vous propose une prestation clé en main, pensée pour votre réalité, avec des résultats mesurables à chaque étape.",
+    "Mon approche combine méthode éprouvée et adaptation à votre contexte, pour un résultat concret et durable.",
+    "Je prends en charge l'intégralité du projet : vous gagnez du temps et vous concentrez sur votre cœur de métier.",
+    "Nous avançons par étapes validées ensemble, pour garder la maîtrise du budget, des délais et de la qualité.",
+    "Une solution simple, professionnelle et évolutive, qui répond à votre besoin immédiat tout en préparant la suite.",
+  ],
+  Livrables: [
+    "- Livrable principal conforme au cahier des charges\n- Documentation de prise en main\n- Révisions incluses\n- Support après livraison",
+    "- Une solution finalisée et testée\n- Les fichiers sources\n- Un guide d'utilisation\n- Une session de formation",
+    "- Prestation réalisée dans les délais convenus\n- Points d'étape réguliers\n- Livraison finale + garantie",
+    "- Résultat prêt à l'emploi\n- Formats adaptés à vos usages\n- Accompagnement à la mise en route",
+    "- Tous les éléments convenus\n- Un récapitulatif clair\n- La cession des droits sur les livrables après paiement",
+  ],
+  Planning: [
+    "Démarrage à réception de l'acompte. Livraison estimée selon le périmètre validé, avec des points réguliers.",
+    "Projet organisé en phases : cadrage, réalisation, validation, livraison. Délais confirmés au lancement.",
+    "Une première version rapide, puis des ajustements jusqu'à votre validation finale.",
+    "Planning adapté à vos contraintes, avec une date de livraison ferme convenue ensemble.",
+    "Prestation récurrente reconductible, démarrage sous quelques jours après signature.",
+  ],
+  "Conditions (CGV)": [
+    CGV,
+    "Acompte de 50% à la commande, solde à la livraison. Révisions raisonnables incluses ; au-delà, facturation en sus.",
+    "Paiement à réception de facture sous 15 jours. Tout retard de paiement peut entraîner des pénalités selon la réglementation en vigueur.",
+    "Les livrables restent la propriété du prestataire jusqu'au paiement intégral ; les droits sont cédés au client après solde complet.",
+    "Prix fermes pendant la durée de validité de l'offre. Les frais annexes (déplacements, licences, impressions) sont facturés séparément si applicable.",
+  ],
+};
