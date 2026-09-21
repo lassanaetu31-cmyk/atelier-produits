@@ -29,7 +29,7 @@ SOCLE COMMUN (packages/core) — build 1 fois
 |---|-----|--------|------|--------------|-----------|--------------------------|
 | 1 | **Invoice + Quote Generator** ⭐ PRIORITÉ | ✅ MVP vendable | 5 | 12–35k FCFA | $19–59 | PDF, Money, Storage, Licence |
 | 2 | WhatsApp Catalog Builder | ✅ MVP vendable | 5 | 7,5–25k | $19–49 | PDF, WhatsApp, Storage |
-| 3 | Proposal Generator | ⏳ | 5 | 10–30k | $19–69 | PDF, Money, Storage |
+| 3 | **Proposal Generator** | ✅ MVP vendable | 5 | 10–30k | $19–69 | PDF, Money, Storage, WhatsApp, Licence |
 | 4 | Inventory + Profit Calculator | ⏳ | 4 | 15–35k | $15–49 | Money, Export, Storage |
 | 5 | Link-in-Bio Business Builder | ⏳ | 6 | 10–25k | $19–79 | WhatsApp, Storage |
 | 6 | WhatsApp Sales Assistant | ⏳ | 6 | 15–35k | $29–79 | WhatsApp, Storage |
@@ -86,7 +86,20 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 4. **Commande WhatsApp** — bouton/lien prérempli par produit (`{produit}`/`{prix}`) + QR par produit.
 5. **Licence** — déjà en place (gate, produit `catalog-builder`). Packaging identique à Invoice.
 
-> Note archi : `LicenseGate` + `license-context` sont dupliqués Invoice/Catalog (petits fichiers). Refactor futur possible : extraire un paquet `packages/ui` React partagé.
+> Note archi : `LicenseGate` + `license-context` sont dupliqués Invoice/Catalog/Proposal (petits fichiers). Refactor futur possible : extraire un paquet `packages/ui` React partagé.
+
+## App #3 — Proposal Generator : plan MVP (pas à pas)
+
+Réutilise ~80% du socle Invoice (PDF, Money, Storage, Licence, clients, backup). Les fonctions « irrésistibles » sont ce qui le distingue d'un simple mode de facture :
+
+1. **Socle PDF étendu** — `buildProposalPdf`/`downloadProposalPdf` dans `core/pdf.ts` : sections narratives (saut de page géré), paliers optionnels en cartes, tableau investissement, acompte, bloc signature (bon pour accord), mentions/CGV. Invoice + Catalog rebuild OK (non-régression).
+2. **Modèles métier 1-clic** (`templates.ts`) — dev/web, design, marketing, conseil, photo : titre + sections (problème/solution/livrables/planning/CGV) + services pré-remplis → proposition en 2 min au lieu de 30.
+3. **Formules à 3 niveaux** (Essentiel/Pro/Premium) optionnelles → good-better-best, panier moyen ↑.
+4. **Acompte (%) + validité (jours)** → cash à la signature + urgence.
+5. **Statut + acceptation en ligne** — Brouillon/Envoyée/Acceptée/Refusée dans l'historique ; « Accepter » saisit le nom du signataire → PDF signé (nom + date).
+6. **Envoi WhatsApp prérempli** (socle `whatsappLink`) depuis l'éditeur et l'historique ; passage auto en « Envoyée ».
+7. **Clients** — CRUD + import CSV/vCard + export (réutilise `clients-import` et le socle CSV).
+8. **Packaging** — build fichier unique hors-ligne, docs acheteur (`release-assets/proposal/`), pages produit Chariow + Lemon Squeezy + notes vendeur (`marketing/`), `tools/pack-proposal.ps1` → `release/Proposal-Generator.zip`. Couvert par le test E2E (activation, modèle, PDF réel).
 
 ## Licence — avant de vendre (important)
 
@@ -114,3 +127,9 @@ Légende statut : ✅ fini · 🔨 en cours · ⏳ à venir
 - 2026-09-20 — **Test E2E (option D)** : `tools/e2e-test.mjs` (Playwright, Chrome système, `file://`) valide sur les 2 ZIP : activation par clé, rejet clé invalide, génération PDF réelle, ajout produit (IndexedDB sous file://), zéro erreur JS. `npm run test:e2e`. Confirme que le modèle "1 fichier hors-ligne" fonctionne dans Chrome.
 - 2026-09-20 — Invoice : import clients en masse (CSV délimiteur auto `,`/`;` + colonnes détectées, ou fichier contacts `.vcf` du téléphone), création auto anti-doublons (téléphone/nom), export CSV + modèle. Couvert par le test E2E. ZIP repackagé.
 - 2026-09-20 — Socle : parseur CSV extrait dans `core/csv.ts` (`parseCsvRows`, `normalizeHeader`) réutilisé. Catalog : import produits CSV (colonnes détectées, prix/disponibilité parsés, anti-doublons réf/nom), export CSV + modèle. Couvert par le test E2E (2 produits). Les 2 ZIP rebuild/repackagés.
+- 2026-09-21 — **App #3 Proposal Generator : MVP vendable.** Nouveau `apps/proposal` (workspace, licence gate produit `proposal-generator`, db proposals/clients/settings/counters, shell 4 onglets). Socle étendu : `buildProposalPdf`/`downloadProposalPdf` (sections narratives avec sauts de page, paliers en cartes, tableau investissement, acompte, bloc signature, CGV) — Invoice + Catalog non régressés. Réutilise clients/backup/profil/CSV du socle Invoice (~80%).
+- 2026-09-21 — Proposal, fonctions « irrésistibles » : modèles métier 1-clic (`templates.ts` : web/design/marketing/conseil/photo), formules à 3 niveaux (Essentiel/Pro/Premium), acompte % + validité jours, statut (Brouillon/Envoyée/Acceptée/Refusée) + acceptation en ligne (PDF signé nom+date), envoi WhatsApp prérempli. Numérotation séquentielle atomique `PROP-2026-0001`.
+- 2026-09-21 — Proposal packaging : docs acheteur (`release-assets/proposal/`), pages produit Chariow + Lemon Squeezy + notes vendeur (`marketing/`), `tools/pack-proposal.ps1` → `release/Proposal-Generator.zip` (~374 Ko). Test E2E étendu (3ᵉ bloc : activation clé `proposal-generator`, application d'un modèle métier, génération PDF réelle de 16,7 Ko sous file://) — **tous les tests passent**.
+- 2026-09-21 — Proposal, module **Adhérents** (suivi cotisations, inspiré d'un panneau admin) : onglet dédié, table Dexie `members` (db v2, backup v2 mis à jour), saisie manuelle CRUD (matricule, nom, email, ville, type, échéance, payé), statut dérivé (Payé/Non payé/En retard si échéance dépassée), 4 compteurs (total, à jour, en retard, taux de recouvrement), recherche + filtres, « Marquer payé » 1-clic. Imports/exports : CSV (colonnes détectées, anti-doublons matricule/nom, modèle), PDF liste imprimable (nouveau `buildMembersPdf`/`downloadMembersPdf` dans le socle, coloration du statut), `adherents.json`. E2E étendu (saisie manuelle + PDF liste). Invoice + Catalog non régressés.
+- 2026-09-21 — **Portail public (web) — approche WhatsApp zéro backend.** Constat : l'app hors-ligne convient à l'opérateur, mais le client final ne téléchargera jamais un fichier pour commander/s'inscrire. Solution : nouveau `apps/portal` (fichier HTML unique, **sans licence**, hébergé UNE fois par le vendeur), piloté par l'URL — `?v=inscription` (formulaire adhésion) et `?v=accept` (résumé proposition + « J'accepte »). À la validation, ouvre un **message WhatsApp prérempli** vers l'opérateur (aucune donnée serveur). Chaque opérateur partage un lien paramétré (nom, numéro, détails) → zéro hébergement par acheteur.
+- 2026-09-21 — Proposal câblé au portail : profil `whatsappPhone` + `portalUrl` (onglet Profil), générateur `portal-links.ts` (`inscriptionLink`/`acceptLink`), bloc « Lien d'inscription public » (copier/tester) dans Adhérents, lien « Accepter en 1 clic » ajouté au message WhatsApp d'envoi de proposition (éditeur + historique). Note d'hébergement `marketing/portal-hosting.md`. E2E : 4ᵉ contexte (portail) — rendu paramétré + inscription et acceptation → wa.me préremplis (route interceptée). **Tous les tests passent.** Pivot possible plus tard vers backend léger (auto-sync) = offre SaaS.

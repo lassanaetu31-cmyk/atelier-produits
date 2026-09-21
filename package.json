@@ -11,6 +11,10 @@
     "build:invoice": "npm run build --workspace apps/invoice",
     "dev:catalog": "npm run dev --workspace apps/catalog",
     "build:catalog": "npm run build --workspace apps/catalog",
+    "dev:proposal": "npm run dev --workspace apps/proposal",
+    "build:proposal": "npm run build --workspace apps/proposal",
+    "dev:portal": "npm run dev --workspace apps/portal",
+    "build:portal": "npm run build --workspace apps/portal",
     "genkey": "node tools/genkey.mjs",
     "test:e2e": "node tools/e2e-test.mjs"
   },

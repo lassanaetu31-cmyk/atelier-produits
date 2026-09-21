@@ -1,0 +1,102 @@
+==================================================
+ PROPOSAL GENERATOR — Propositions commerciales pro
+==================================================
+
+Merci pour votre achat !
+
+Ce logiciel fonctionne HORS-LIGNE, directement dans votre navigateur.
+Aucune installation, aucun compte, aucune connexion requise.
+Vos données restent sur VOTRE appareil.
+
+
+--------------------------------------------------
+1) OUVRIR LE LOGICIEL
+--------------------------------------------------
+- Double-cliquez sur le fichier :  Proposal-Generator.html
+- Ouvrez-le de préférence avec GOOGLE CHROME ou MICROSOFT EDGE.
+  (Sur téléphone : ouvrez le fichier avec Chrome.)
+- Astuce : clic droit sur le fichier > "Ouvrir avec" > Chrome.
+
+IMPORTANT : ne déplacez pas le fichier après l'avoir ouvert la
+première fois, et n'effacez pas les données de navigation du site,
+sinon vos propositions enregistrées seront perdues (voir Sauvegarde).
+
+
+--------------------------------------------------
+2) ACTIVER VOTRE LICENCE
+--------------------------------------------------
+- Au premier lancement, collez la CLÉ DE LICENCE reçue avec votre achat.
+- Cliquez sur "Activer". C'est fait, à vie (sauf licence à durée limitée).
+- Pas reçu de clé ? Répondez au message d'achat avec votre reçu.
+
+
+--------------------------------------------------
+3) FAIRE UNE PROPOSITION EN 2 MINUTES
+--------------------------------------------------
+- Onglet PROFIL : renseignez votre activité (nom, logo, couleur,
+  coordonnées, mentions de bas de page). Ces infos apparaissent sur
+  chaque proposition et au bloc signature.
+- Onglet CLIENTS : enregistrez vos clients (ou importez un CSV / un
+  fichier de contacts .vcf du téléphone). Un client avec téléphone
+  permet l'envoi WhatsApp en un clic.
+- Onglet ÉDITEUR :
+    * "Partir d'un modèle métier" : dev/web, design, marketing,
+      conseil, photo — TOUT est pré-rempli, vous n'avez qu'à ajuster.
+    * Modifiez le titre, les sections (problème, solution, livrables,
+      planning, CGV), le détail chiffré, la remise/taxe.
+    * FORMULES (optionnel) : ajoutez 2-3 offres (Essentiel / Pro /
+      Premium). Le client choisit → votre panier moyen monte.
+    * Acompte (%) et Validité (jours) : cash + urgence.
+    * "Télécharger le PDF" génère la proposition ET l'enregistre.
+    * "Envoyer par WhatsApp" ouvre un message prérempli pour le client.
+- Onglet HISTORIQUE : suivez le statut (Brouillon / Envoyée / Acceptée /
+  Refusée), rouvrez, re-téléchargez.
+    * "Accepter" : saisissez le nom du client → la proposition passe en
+      ACCEPTÉE et un PDF signé (nom + date) est généré.
+- Onglet ADHÉRENTS : suivi des cotisations / abonnés.
+    * Saisissez vos adhérents à la main (matricule, nom, email, ville,
+      type, date d'échéance) ou importez un CSV.
+    * Statut automatique : Payé / Non payé / En retard (échéance dépassée).
+    * Compteurs en haut : total, à jour, en retard, taux de recouvrement.
+    * Recherche + filtres (Tous / Payé / Non payé), "Marquer payé" en 1 clic.
+    * Exports : CSV, PDF (liste imprimable), adherents.json.
+
+
+--------------------------------------------------
+4) SAUVEGARDE (À FAIRE RÉGULIÈREMENT)
+--------------------------------------------------
+Vos données sont stockées localement par votre navigateur.
+- Onglet PROFIL > "Exporter une sauvegarde" : enregistre un fichier .json.
+- Gardez ce fichier en lieu sûr (clé USB, email, cloud).
+- Pour récupérer vos données : PROFIL > "Restaurer une sauvegarde".
+
+
+--------------------------------------------------
+5) LIENS CLIENT SANS INSTALLATION (PORTAIL)
+--------------------------------------------------
+Vos clients n'ont RIEN à installer : ils ouvrent un simple lien.
+- Onglet PROFIL > "Portail public" : renseignez votre numéro WhatsApp et
+  l'URL du portail (fournie par le vendeur, hébergée une seule fois).
+- Onglet ADHÉRENTS : un "Lien d'inscription public" apparaît. Partagez-le
+  (bio, statut WhatsApp, flyer). L'adhérent remplit → son inscription vous
+  arrive par WhatsApp, vous la saisissez dans la liste.
+- Proposition envoyée par WhatsApp : le message inclut un lien
+  "Accepter en 1 clic". Le client accepte → sa réponse vous revient par
+  WhatsApp. Aucune donnée ne transite par un serveur.
+
+
+--------------------------------------------------
+6) BON À SAVOIR
+--------------------------------------------------
+- Le logiciel n'envoie aucune donnée sur Internet.
+- Les modèles de proposition/CGV sont fournis à titre indicatif.
+  Vérifiez les mentions applicables dans votre pays avant usage officiel.
+
+
+--------------------------------------------------
+SUPPORT
+--------------------------------------------------
+Un problème, une question ? Contactez le vendeur via la plateforme
+d'achat, avec votre reçu.
+
+Bonnes ventes !

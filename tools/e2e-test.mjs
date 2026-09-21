@@ -18,6 +18,8 @@ function makeKey(product, buyer = "Test E2E", plan = "pro", expiresAt = 0) {
 const root = path.resolve(fileURLToPath(import.meta.url), "..", "..");
 const invoiceHtml = path.join(root, "release", "Invoice-Generator", "Invoice-Generator.html");
 const catalogHtml = path.join(root, "release", "Catalog-Builder", "Catalog-Builder.html");
+const proposalHtml = path.join(root, "release", "Proposal-Generator", "Proposal-Generator.html");
+const portalHtml = path.join(root, "apps", "portal", "dist", "index.html");
 
 const results = [];
 const log = (ok, msg) => {
@@ -146,6 +148,118 @@ try {
       !!fp && dl.suggestedFilename().endsWith(".pdf") && size > 1000,
       `catalogue PDF généré : ${dl.suggestedFilename()} (${size} octets)`,
     );
+
+    log(errors.length === 0, `aucune erreur JS${errors.length ? " : " + errors[0] : ""}`);
+    await ctx.close();
+  }
+
+  // ---------------- PROPOSAL ----------------
+  console.log("\n=== Proposal Generator ===");
+  {
+    const ctx = await browser.newContext({ acceptDownloads: true });
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+
+    await page.goto(pathToFileURL(proposalHtml).href);
+    await page.getByPlaceholder("Coller la clé de licence").fill(makeKey("proposal-generator"));
+    await page.getByRole("button", { name: "Activer" }).click();
+
+    const pdfBtn = page.getByRole("button", { name: "Télécharger le PDF" });
+    await pdfBtn.waitFor({ timeout: 8000 });
+    log(true, "activation licence (clé valide)");
+
+    // Modèle métier 1-clic : remplit le titre du projet
+    await page.getByRole("combobox").first().selectOption({ label: "Site web / dev" });
+    const titled = await page
+      .getByPlaceholder("Ex. Création de votre site web")
+      .inputValue()
+      .then((v) => v.length > 0)
+      .catch(() => false);
+    log(titled, "modèle métier appliqué (proposition pré-remplie)");
+
+    const [dl] = await Promise.all([
+      page.waitForEvent("download", { timeout: 15000 }),
+      pdfBtn.click(),
+    ]);
+    const fp = await dl.path();
+    const size = fp ? fs.statSync(fp).size : 0;
+    log(
+      !!fp && dl.suggestedFilename().endsWith(".pdf") && size > 1000,
+      `proposition PDF générée : ${dl.suggestedFilename()} (${size} octets)`,
+    );
+
+    // Module Adhérents : saisie manuelle + export PDF
+    await page.getByRole("button", { name: "Adhérents" }).click();
+    await page.getByPlaceholder("Matricule", { exact: true }).fill("ADH-001");
+    await page.getByPlaceholder("Nom / Prénom *").fill("Awa Diallo");
+    await page.getByRole("button", { name: "Ajouter" }).click();
+    const memberAdded = await page
+      .getByText("Awa Diallo")
+      .first()
+      .waitFor({ timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+    log(memberAdded, "adhérent ajouté manuellement");
+
+    const [mdl] = await Promise.all([
+      page.waitForEvent("download", { timeout: 15000 }),
+      page.getByRole("button", { name: "Télécharger PDF" }).click(),
+    ]);
+    const mfp = await mdl.path();
+    const msize = mfp ? fs.statSync(mfp).size : 0;
+    log(
+      !!mfp && mdl.suggestedFilename().endsWith(".pdf") && msize > 1000,
+      `liste adhérents PDF générée : ${mdl.suggestedFilename()} (${msize} octets)`,
+    );
+
+    log(errors.length === 0, `aucune erreur JS${errors.length ? " : " + errors[0] : ""}`);
+    await ctx.close();
+  }
+
+  // ---------------- PORTAL PUBLIC (client, sans licence) ----------------
+  console.log("\n=== Portail public ===");
+  {
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+
+    // Intercepte la redirection wa.me pour capturer le lien sans sortir sur Internet.
+    let waUrl = "";
+    await page.route("**/wa.me/**", async (route) => {
+      waUrl = route.request().url();
+      await route.fulfill({ status: 200, contentType: "text/html", body: "ok" });
+    });
+
+    const base = pathToFileURL(portalHtml).href;
+    await page.goto(`${base}?v=inscription&org=${encodeURIComponent("Club Test")}&to=221771234567`);
+    await page.getByText("Inscription — Club Test").waitFor({ timeout: 8000 });
+    log(true, "portail : page d'inscription rendue (lien paramétré)");
+
+    await page.getByLabel("Nom / Prénom *").fill("Awa Diallo");
+    await Promise.all([
+      page.waitForURL(/wa\.me/, { timeout: 8000 }),
+      page.getByRole("button", { name: "Envoyer mon inscription" }).click(),
+    ]);
+    const okInscr = waUrl.includes("wa.me/221771234567") && /Awa/.test(decodeURIComponent(waUrl));
+    log(okInscr, "portail : inscription -> WhatsApp prérempli vers l'admin");
+
+    // Vue acceptation
+    waUrl = "";
+    await page.goto(
+      `${base}?v=accept&org=Studio&to=221770000000&num=PROP-2026-0001&title=${encodeURIComponent(
+        "Site web",
+      )}&amount=700000&cur=XOF&days=30`,
+    );
+    await page.getByText("Site web").waitFor({ timeout: 8000 });
+    await page.getByLabel("Votre nom (bon pour accord)").fill("Modou Kane");
+    await Promise.all([
+      page.waitForURL(/wa\.me/, { timeout: 8000 }),
+      page.getByRole("button", { name: "J'accepte cette proposition" }).click(),
+    ]);
+    const okAccept = waUrl.includes("wa.me/221770000000") && /accepte/i.test(decodeURIComponent(waUrl));
+    log(okAccept, "portail : acceptation -> WhatsApp prérempli vers le prestataire");
 
     log(errors.length === 0, `aucune erreur JS${errors.length ? " : " + errors[0] : ""}`);
     await ctx.close();
