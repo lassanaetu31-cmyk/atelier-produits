@@ -148,24 +148,20 @@ export default function ProfileView() {
           Permet à vos clients de s'inscrire ou d'accepter une proposition depuis un simple lien,
           sans rien installer : leur réponse vous revient par WhatsApp.
         </p>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <input
-            className="rounded border px-3 py-2 text-sm"
-            placeholder="Numéro WhatsApp (ex. 221771234567)"
-            value={form.whatsappPhone ?? ""}
-            onChange={(e) => patch({ whatsappPhone: e.target.value })}
-          />
-          <input
-            className="rounded border px-3 py-2 text-sm"
-            placeholder="URL du portail (https://…)"
-            value={form.portalUrl ?? ""}
-            onChange={(e) => patch({ portalUrl: e.target.value })}
-          />
-        </div>
-        <p className="-mt-1 text-xs text-slate-400">
-          L'URL du portail vous est communiquée par le vendeur (hébergé une seule fois). Laissez vide
-          si vous ne l'utilisez pas encore.
-        </p>
+        <input
+          className="rounded border px-3 py-2 text-sm"
+          placeholder="Numéro WhatsApp (ex. 221771234567)"
+          value={form.whatsappPhone ?? ""}
+          onChange={(e) => {
+            const phone = e.target.value;
+            patch({
+              whatsappPhone: phone,
+              portalUrl: phone.trim()
+                ? "https://lassanaetu31-cmyk.github.io/atelier-produits/portal/"
+                : "",
+            });
+          }}
+        />
       </div>
 
       {err && <p className="text-sm font-medium text-red-500">{err}</p>}
