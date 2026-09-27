@@ -1,0 +1,24 @@
+{
+  "name": "Proposal Generator",
+  "short_name": "Proposals",
+  "description": "Créez et gérez vos propositions commerciales",
+  "start_url": "/atelier-produits/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/atelier-produits/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/atelier-produits/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

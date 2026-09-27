@@ -67,11 +67,15 @@ export default function ProfileView() {
           )}
         </div>
         <div className="flex flex-col gap-1 text-sm">
-          <input
-            type="file"
-            accept="image/png,image/jpeg"
-            onChange={(e) => onLogo(e.target.files?.[0])}
-          />
+          <label className="cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-center font-medium hover:bg-slate-50">
+            Choisir un logo
+            <input
+              type="file"
+              accept="image/png,image/jpeg"
+              className="hidden"
+              onChange={(e) => onLogo(e.target.files?.[0])}
+            />
+          </label>
           {form.logoDataUrl && (
             <button
               className="justify-self-start text-left text-xs text-red-500 hover:underline"
@@ -83,7 +87,7 @@ export default function ProfileView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <input
           className="rounded border px-3 py-2 text-sm"
           placeholder="Nom / activité *"
@@ -144,7 +148,7 @@ export default function ProfileView() {
           Permet à vos clients de s'inscrire ou d'accepter une proposition depuis un simple lien,
           sans rien installer : leur réponse vous revient par WhatsApp.
         </p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <input
             className="rounded border px-3 py-2 text-sm"
             placeholder="Numéro WhatsApp (ex. 221771234567)"
