@@ -3,7 +3,7 @@ import { exportBackup, importBackup } from "../backup";
 import { DEFAULT_PROFILE, saveProfile, useProfile } from "../profile";
 import type { CompanyProfile } from "../types";
 
-const MAX_LOGO_BYTES = 500 * 1024; // 500 Ko : garde les PDF légers
+const MAX_LOGO_BYTES = 2 * 1024 * 1024; // 2 Mo
 
 export default function ProfileView() {
   const stored = useProfile();
@@ -71,7 +71,7 @@ export default function ProfileView() {
             Choisir un logo
             <input
               type="file"
-              accept="image/png,image/jpeg"
+              accept="image/*"
               className="hidden"
               onChange={(e) => onLogo(e.target.files?.[0])}
             />
