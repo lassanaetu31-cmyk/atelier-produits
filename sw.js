@@ -1,4 +1,4 @@
-const CACHE = "proposal-v1";
+const CACHE = "proposal-v2";
 const ASSETS = ["/atelier-produits/", "/atelier-produits/index.html"];
 
 self.addEventListener("install", (e) => {
