@@ -140,7 +140,7 @@ export default function EditorView({
   }
 
   async function pdf() {
-    downloadPdf(await persist(), profile);
+    downloadPdf(await persist(), profile, lang);
   }
 
   async function sendWhatsApp() {
@@ -154,7 +154,7 @@ export default function EditorView({
       await db.proposals.update(saved.id!, { status: "Envoyée" });
       setDraft({ ...saved, status: "Envoyée" });
     }
-    window.open(proposalWhatsappLink(saved, selectedClient.phone, acceptLink(profile, saved)), "_blank");
+    window.open(proposalWhatsappLink(saved, selectedClient.phone, acceptLink(profile, saved), lang), "_blank");
   }
 
   return (

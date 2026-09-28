@@ -17,7 +17,7 @@ function statusClass(s: ProposalStatus) {
 }
 
 export default function HistoryView({ onOpen }: { onOpen: (p: SavedProposal) => void }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const profile = useProfile();
   const clients = useLiveQuery(() => db.clients.toArray(), [], []);
   const props = useLiveQuery<SavedProposal[], SavedProposal[]>(
@@ -30,7 +30,7 @@ export default function HistoryView({ onOpen }: { onOpen: (p: SavedProposal) => 
     const name = window.prompt(t("history.acceptPrompt"), p.clientName);
     if (!name?.trim()) return;
     const updated = await accept(p, name);
-    downloadPdf(updated, profile);
+    downloadPdf(updated, profile, lang);
   }
 
   function phoneOf(p: SavedProposal): string | undefined {
@@ -73,9 +73,9 @@ export default function HistoryView({ onOpen }: { onOpen: (p: SavedProposal) => 
                   </span>
                   <button className="text-xs text-blue-600 hover:underline" onClick={() => onOpen(p)}>{t("history.open")}</button>
                   <button className="text-xs text-green-600 hover:underline" onClick={() => onAccept(p)}>{t("history.accept")}</button>
-                  <button className="text-xs text-slate-500 hover:underline" onClick={() => downloadPdf(p, profile)}>{t("history.pdf")}</button>
+                  <button className="text-xs text-slate-500 hover:underline" onClick={() => downloadPdf(p, profile, lang)}>{t("history.pdf")}</button>
                   {phone && (
-                    <a className="text-xs text-slate-500 hover:underline" href={proposalWhatsappLink(p, phone, acceptLink(profile, p))} target="_blank" rel="noreferrer">
+                    <a className="text-xs text-slate-500 hover:underline" href={proposalWhatsappLink(p, phone, acceptLink(profile, p), lang)} target="_blank" rel="noreferrer">
                       {t("history.send")}
                     </a>
                   )}

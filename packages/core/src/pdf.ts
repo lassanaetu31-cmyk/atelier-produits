@@ -151,6 +151,50 @@ export interface ProposalTier {
   highlighted?: boolean;
 }
 
+export interface ProposalPdfLabels {
+  document: string;       // "PROPOSITION" / "PROPOSAL"
+  validFor: string;       // "Valable {n} jours" — {n} replaced with days
+  preparedFor: string;    // "Préparé pour"
+  tiers: string;          // "FORMULES"
+  investment: string;     // "INVESTISSEMENT"
+  colDesc: string;        // "Prestation"
+  colQty: string;         // "Qté"
+  colUnit: string;        // "Prix unit."
+  colTotal: string;       // "Total"
+  subtotal: string;       // "Sous-total"
+  discount: string;       // "Remise"
+  tax: string;            // "Taxe"
+  shipping: string;       // "Frais"
+  total: string;          // "TOTAL"
+  deposit: string;        // "Acompte de {rate}% à la signature : {amount}"
+  provider: string;       // "Le prestataire"
+  clientApproval: string; // "Le client (bon pour accord)"
+  acceptedOn: string;     // "Accepté le {date}"
+  signHere: string;       // "Nom, date et signature"
+}
+
+const FR_LABELS: ProposalPdfLabels = {
+  document: "PROPOSITION",
+  validFor: "Valable {n} jours",
+  preparedFor: "Préparé pour",
+  tiers: "FORMULES",
+  investment: "INVESTISSEMENT",
+  colDesc: "Prestation",
+  colQty: "Qté",
+  colUnit: "Prix unit.",
+  colTotal: "Total",
+  subtotal: "Sous-total",
+  discount: "Remise",
+  tax: "Taxe",
+  shipping: "Frais",
+  total: "TOTAL",
+  deposit: "Acompte de {rate}% à la signature : {amount}",
+  provider: "Le prestataire",
+  clientApproval: "Le client (bon pour accord)",
+  acceptedOn: "Accepté le {date}",
+  signHere: "Nom, date et signature",
+};
+
 export interface ProposalData {
   number: string;
   title: string;
@@ -169,6 +213,7 @@ export interface ProposalData {
   notes?: string;
   acceptedName?: string;
   acceptedDate?: string;
+  labels?: Partial<ProposalPdfLabels>;
 }
 
 /**
@@ -176,6 +221,7 @@ export interface ProposalData {
  * + tableau investissement + acompte + bloc signature). Gère les sauts de page.
  */
 export function buildProposalPdf(data: ProposalData): jsPDF {
+  const L: ProposalPdfLabels = { ...FR_LABELS, ...data.labels };
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const accent = hexToRgb(data.accentColor ?? "#2563eb");
   const M = 15;
@@ -203,13 +249,13 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
   }
   doc.setFontSize(22);
   doc.setTextColor(...accent);
-  doc.text("PROPOSITION", PW - M, y + 8, { align: "right" });
+  doc.text(L.document, PW - M, y + 8, { align: "right" });
   doc.setFontSize(10);
   doc.setTextColor(90);
   doc.text(`N° ${data.number}`, PW - M, y + 15, { align: "right" });
   doc.text(data.date, PW - M, y + 20, { align: "right" });
   if (data.validityDays) {
-    doc.text(`Valable ${data.validityDays} jours`, PW - M, y + 25, { align: "right" });
+    doc.text(L.validFor.replace("{n}", String(data.validityDays)), PW - M, y + 25, { align: "right" });
   }
   y += 34;
 
@@ -231,7 +277,7 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
 
   doc.setFontSize(9);
   doc.setTextColor(120);
-  doc.text("Préparé pour", 120, y);
+  doc.text(L.preparedFor, 120, y);
   doc.setFontSize(11);
   doc.setTextColor(20);
   doc.text(data.to.name, 120, y + 5);
@@ -271,7 +317,7 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
     ensure(14);
     doc.setFontSize(12);
     doc.setTextColor(...accent);
-    doc.text("FORMULES", M, y);
+    doc.text(L.tiers, M, y);
     y += 2;
     doc.setDrawColor(...accent);
     doc.setLineWidth(0.4);
@@ -317,11 +363,11 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
     ensure(24);
     doc.setFontSize(12);
     doc.setTextColor(...accent);
-    doc.text("INVESTISSEMENT", M, y);
+    doc.text(L.investment, M, y);
     y += 4;
     autoTable(doc, {
       startY: y,
-      head: [["Prestation", "Qté", "Prix unit.", "Total"]],
+      head: [[L.colDesc, L.colQty, L.colUnit, L.colTotal]],
       body: data.items.map((it: LineItem) => [
         it.description,
         String(it.quantity),
@@ -337,10 +383,10 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
     y = (doc.lastAutoTable?.finalY ?? y) + 8;
 
     const t = data.totals;
-    const rows: [string, number][] = [["Sous-total", t.subtotal]];
-    if (t.discount) rows.push(["Remise", -t.discount]);
-    if (t.tax) rows.push(["Taxe", t.tax]);
-    if (t.shipping) rows.push(["Frais", t.shipping]);
+    const rows: [string, number][] = [[L.subtotal, t.subtotal]];
+    if (t.discount) rows.push([L.discount, -t.discount]);
+    if (t.tax) rows.push([L.tax, t.tax]);
+    if (t.shipping) rows.push([L.shipping, t.shipping]);
     ensure(rows.length * 6 + 20);
     doc.setFontSize(10);
     doc.setTextColor(60);
@@ -355,7 +401,7 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
     y += 6;
     doc.setFontSize(13);
     doc.setTextColor(...accent);
-    doc.text("TOTAL", 140, y);
+    doc.text(L.total, 140, y);
     doc.text(formatMoney(t.total, data.currency), 195, y, { align: "right" });
     y += 8;
     if (data.depositRate) {
@@ -363,7 +409,9 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
       doc.setFontSize(9);
       doc.setTextColor(110);
       doc.text(
-        `Acompte de ${data.depositRate}% à la signature : ${formatMoney(deposit, data.currency)}`,
+        L.deposit
+          .replace("{rate}", String(data.depositRate))
+          .replace("{amount}", formatMoney(deposit, data.currency)),
         195,
         y,
         { align: "right" },
@@ -381,8 +429,8 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
   const sy = y;
   doc.setFontSize(9);
   doc.setTextColor(120);
-  doc.text("Le prestataire", M, sy);
-  doc.text("Le client (bon pour accord)", M + colW + 10, sy);
+  doc.text(L.provider, M, sy);
+  doc.text(L.clientApproval, M + colW + 10, sy);
   doc.setFontSize(10);
   doc.setTextColor(30);
   doc.text(data.from.name, M, sy + 7);
@@ -391,13 +439,13 @@ export function buildProposalPdf(data: ProposalData): jsPDF {
     doc.text(data.acceptedName, M + colW + 10, sy + 7);
     doc.setFontSize(8);
     doc.setTextColor(120);
-    doc.text(`Accepté le ${data.acceptedDate ?? ""}`, M + colW + 10, sy + 12);
+    doc.text(L.acceptedOn.replace("{date}", data.acceptedDate ?? ""), M + colW + 10, sy + 12);
   } else {
     doc.setDrawColor(190, 190, 190);
     doc.line(M + colW + 10, sy + 12, M + 2 * colW + 10, sy + 12);
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text("Nom, date et signature", M + colW + 10, sy + 16);
+    doc.text(L.signHere, M + colW + 10, sy + 16);
   }
   y = sy + 22;
 
