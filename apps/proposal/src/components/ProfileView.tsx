@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { exportBackup, importBackup } from "../backup";
 import { DEFAULT_PROFILE, saveProfile, useProfile } from "../profile";
 import type { CompanyProfile } from "../types";
@@ -10,6 +10,15 @@ export default function ProfileView() {
   const [form, setForm] = useState<CompanyProfile>(stored);
   const [flash, setFlash] = useState("");
   const [err, setErr] = useState("");
+  const initialized = useRef(false);
+
+  // Sync form when IndexedDB data loads (useLiveQuery is async)
+  useEffect(() => {
+    if (!initialized.current && stored.id) {
+      setForm(stored);
+      initialized.current = true;
+    }
+  }, [stored]);
 
   function patch(p: Partial<CompanyProfile>) {
     setForm((f) => ({ ...f, ...p }));
@@ -162,6 +171,25 @@ export default function ProfileView() {
             });
           }}
         />
+        {form.portalUrl && (
+          <div className="flex items-center gap-2 rounded border bg-slate-50 px-3 py-2 text-sm">
+            <span className="min-w-0 flex-1 truncate text-slate-600">{form.portalUrl}</span>
+            <button
+              type="button"
+              className="shrink-0 text-xs text-blue-600 hover:underline"
+              onClick={() => {
+                navigator.clipboard.writeText(form.portalUrl!);
+                setFlash("URL copiée ✓");
+                setTimeout(() => setFlash(""), 2000);
+              }}
+            >
+              Copier
+            </button>
+          </div>
+        )}
+        <p className="-mt-1 text-xs text-slate-400">
+          Entrez votre numéro WhatsApp pour générer l'URL du portail client.
+        </p>
       </div>
 
       {err && <p className="text-sm font-medium text-red-500">{err}</p>}
