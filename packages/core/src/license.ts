@@ -44,8 +44,53 @@ export async function generateLicense(payload: LicensePayload, secret?: string):
   return `${body}.${sig}`;
 }
 
-/** Vérifie une clé (usage app cliente). */
-export async function verifyLicense(key: string, secret?: string): Promise<LicenseCheck> {
+/**
+ * Vérifie une clé Gumroad via leur API publique.
+ * permalink = identifiant du produit dans l'URL Gumroad (ex: "proposal-generator").
+ */
+export async function verifyGumroadLicense(
+  key: string,
+  permalink: string,
+): Promise<LicenseCheck> {
+  try {
+    const res = await fetch("https://api.gumroad.com/v2/licenses/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ product_permalink: permalink, license_key: key.trim() }),
+    });
+    const data = (await res.json()) as {
+      success: boolean;
+      message?: string;
+      purchase?: { email: string; product_name: string; variants?: string };
+    };
+    if (!data.success) return { valid: false, reason: data.message ?? "Clé invalide" };
+    const payload: LicensePayload = {
+      product: permalink,
+      buyer: data.purchase?.email ?? "",
+      plan: "pro",
+      expiresAt: 0,
+    };
+    return { valid: true, payload };
+  } catch {
+    return { valid: false, reason: "Impossible de vérifier (réseau)" };
+  }
+}
+
+/** Vérifie une clé — Gumroad d'abord, puis HMAC offline (clés manuelles). */
+export async function verifyLicense(
+  key: string,
+  gumroadPermalink?: string,
+  secret?: string,
+): Promise<LicenseCheck> {
+  // Clé Gumroad : format UUID (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+  const isGumroad = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i.test(
+    key.trim(),
+  );
+  if (isGumroad && gumroadPermalink) {
+    return verifyGumroadLicense(key, gumroadPermalink);
+  }
+
+  // Clé HMAC manuelle : format BASE64URL.SIGNATURE
   const parts = key.trim().split(".");
   if (parts.length !== 2) return { valid: false, reason: "Format de clé invalide" };
   const [body, sig] = parts;

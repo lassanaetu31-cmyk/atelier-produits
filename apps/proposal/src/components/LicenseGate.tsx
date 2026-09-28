@@ -6,7 +6,7 @@ import {
   verifyLicense,
   type LicensePayload,
 } from "@atelier/core";
-import { LicenseContext, PRODUCT_ID, PRODUCT_NAME } from "../license-context";
+import { LicenseContext, PRODUCT_ID, PRODUCT_NAME, GUMROAD_PERMALINK } from "../license-context";
 
 type Status = "checking" | "locked" | "unlocked";
 
@@ -20,8 +20,8 @@ export default function LicenseGate({ children }: { children: ReactNode }) {
     (async () => {
       const stored = loadLicense();
       if (!stored) return setStatus("locked");
-      const res = await verifyLicense(stored);
-      if (res.valid && res.payload?.product === PRODUCT_ID) {
+      const res = await verifyLicense(stored, GUMROAD_PERMALINK);
+      if (res.valid && (res.payload?.product === PRODUCT_ID || res.payload?.product === GUMROAD_PERMALINK)) {
         setLicense(res.payload);
         setStatus("unlocked");
       } else {
@@ -33,9 +33,9 @@ export default function LicenseGate({ children }: { children: ReactNode }) {
   async function activate() {
     setError("");
     const key = keyInput.trim();
-    const res = await verifyLicense(key);
+    const res = await verifyLicense(key, GUMROAD_PERMALINK);
     if (!res.valid) return setError(res.reason ?? "Clé invalide.");
-    if (res.payload?.product !== PRODUCT_ID) {
+    if (res.payload?.product !== PRODUCT_ID && res.payload?.product !== GUMROAD_PERMALINK) {
       return setError("Cette clé n'est pas valide pour ce produit.");
     }
     saveLicense(key);
