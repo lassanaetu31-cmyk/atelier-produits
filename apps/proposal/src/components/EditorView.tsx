@@ -154,7 +154,7 @@ export default function EditorView({
       await db.proposals.update(saved.id!, { status: "Envoyée" });
       setDraft({ ...saved, status: "Envoyée" });
     }
-    window.open(proposalWhatsappLink(saved, selectedClient.phone, acceptLink(profile, saved), lang), "_blank");
+    window.open(proposalWhatsappLink(saved, selectedClient.phone, acceptLink(profile, saved, lang), lang), "_blank");
   }
 
   return (

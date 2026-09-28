@@ -75,7 +75,7 @@ export default function HistoryView({ onOpen }: { onOpen: (p: SavedProposal) => 
                   <button className="text-xs text-green-600 hover:underline" onClick={() => onAccept(p)}>{t("history.accept")}</button>
                   <button className="text-xs text-slate-500 hover:underline" onClick={() => downloadPdf(p, profile, lang)}>{t("history.pdf")}</button>
                   {phone && (
-                    <a className="text-xs text-slate-500 hover:underline" href={proposalWhatsappLink(p, phone, acceptLink(profile, p), lang)} target="_blank" rel="noreferrer">
+                    <a className="text-xs text-slate-500 hover:underline" href={proposalWhatsappLink(p, phone, acceptLink(profile, p, lang), lang)} target="_blank" rel="noreferrer">
                       {t("history.send")}
                     </a>
                   )}

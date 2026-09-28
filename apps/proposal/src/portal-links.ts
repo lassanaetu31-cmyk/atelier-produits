@@ -1,31 +1,33 @@
 import type { CompanyProfile, SavedProposal } from "./types";
+import type { LangCode } from "./i18n/translations";
 
 /** Le portail est-il configuré (URL + numéro WhatsApp) ? */
 export function portalReady(profile: CompanyProfile): boolean {
   return Boolean(profile.portalUrl?.trim() && profile.whatsappPhone?.trim());
 }
 
-function base(profile: CompanyProfile, view: string): URL | null {
+function base(profile: CompanyProfile, view: string, lang?: LangCode): URL | null {
   if (!portalReady(profile)) return null;
   const url = new URL(profile.portalUrl!.trim());
   url.searchParams.set("v", view);
   url.searchParams.set("org", profile.name);
   url.searchParams.set("to", profile.whatsappPhone!.trim());
   if (profile.accentColor) url.searchParams.set("accent", profile.accentColor.replace("#", ""));
+  if (lang && lang !== "fr") url.searchParams.set("lang", lang);
   return url;
 }
 
 /** Lien public d'inscription des adhérents (à partager : bio, statut WhatsApp, flyer…). */
-export function inscriptionLink(profile: CompanyProfile, types?: string[]): string | null {
-  const url = base(profile, "inscription");
+export function inscriptionLink(profile: CompanyProfile, types?: string[], lang?: LangCode): string | null {
+  const url = base(profile, "inscription", lang);
   if (!url) return null;
   if (types?.length) url.searchParams.set("types", types.join(","));
   return url.toString();
 }
 
 /** Lien public d'acceptation d'une proposition (1 tap → WhatsApp au prestataire). */
-export function acceptLink(profile: CompanyProfile, p: SavedProposal): string | null {
-  const url = base(profile, "accept");
+export function acceptLink(profile: CompanyProfile, p: SavedProposal, lang?: LangCode): string | null {
+  const url = base(profile, "accept", lang);
   if (!url) return null;
   url.searchParams.set("num", p.number);
   if (p.title) url.searchParams.set("title", p.title);

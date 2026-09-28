@@ -30,7 +30,7 @@ const EMPTY: Omit<Member, "createdAt"> = {
 type Filter = "all" | "paid" | "unpaid";
 
 export default function MembersView() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const profile = useProfile();
   const members = useLiveQuery<Member[], Member[]>(
     () => db.members.orderBy("name").toArray(),
@@ -43,7 +43,7 @@ export default function MembersView() {
   const [msg, setMsg] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const inscription = inscriptionLink(profile, ["Mensuel", "Trimestriel", "Annuel"]);
+  const inscription = inscriptionLink(profile, ["Mensuel", "Trimestriel", "Annuel"], lang);
 
   const BADGE: Record<DerivedStatus, string> = {
     "Payé": "bg-green-100 text-green-700",
