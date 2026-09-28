@@ -1,22 +1,25 @@
 import { useEffect, useRef, useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import { exportBackup, importBackup } from "../backup";
-import { DEFAULT_PROFILE, saveProfile, useProfile } from "../profile";
+import { DEFAULT_PROFILE, saveProfile } from "../profile";
+import { db } from "../db";
 import type { CompanyProfile } from "../types";
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024; // 2 Mo
 
 export default function ProfileView() {
-  const stored = useProfile();
-  const [form, setForm] = useState<CompanyProfile>(stored);
+  // undefined = en cours de chargement, null = aucun profil enregistré
+  const stored = useLiveQuery(() => db.settings.get(1), []);
+  const [form, setForm] = useState<CompanyProfile>(DEFAULT_PROFILE);
   const [flash, setFlash] = useState("");
   const [err, setErr] = useState("");
   const initialized = useRef(false);
 
-  // Sync form when IndexedDB data loads (useLiveQuery is async)
+  // Charge le profil depuis IndexedDB dès qu'il est disponible (useLiveQuery est async)
   useEffect(() => {
-    if (!initialized.current && stored.id) {
-      setForm(stored);
+    if (stored !== undefined && !initialized.current) {
       initialized.current = true;
+      setForm(stored ?? DEFAULT_PROFILE);
     }
   }, [stored]);
 

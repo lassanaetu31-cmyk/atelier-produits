@@ -67,11 +67,11 @@ export default function App() {
             + Nouvelle
           </button>
         </div>
-        <nav className={`mx-auto mt-3 flex ${width} gap-1 overflow-x-auto`}>
+        <nav className={`mx-auto mt-3 flex ${width} gap-0.5`}>
           {TABS.map((t) => (
             <button
               key={t.id}
-              className={`shrink-0 rounded-lg px-3 py-2 text-sm font-medium sm:px-4 ${
+              className={`flex-1 rounded-lg px-1 py-2 text-xs font-medium sm:px-3 sm:text-sm ${
                 tab === t.id ? "bg-blue-100 text-blue-700" : "text-slate-500 hover:bg-slate-100"
               }`}
               onClick={() => setTab(t.id)}
