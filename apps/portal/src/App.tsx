@@ -215,18 +215,32 @@ const DEFAULT_CFG: FormConfig = {
   consentText: "J'accepte que mes coordonnées soient utilisées afin d'être recontacté(e).",
 };
 
+function decodeCfg(raw: string | null): FormConfig {
+  if (!raw) return DEFAULT_CFG;
+  try {
+    const d = b64urlDecode<Record<string, unknown>>(raw);
+    // format compact (clés courtes t/u/i/r/s/c) ou ancien format complet
+    if ("t" in d || "i" in d) {
+      return {
+        title: (d.t as string) || DEFAULT_CFG.title,
+        subtitle: d.u as string | undefined,
+        interests: (d.i as string[]) || [],
+        recontact: (d.r as string[]) || [],
+        askStructure: d.s !== 0,
+        consentText: (d.c as string) || DEFAULT_CFG.consentText,
+      };
+    }
+    return { ...DEFAULT_CFG, ...(d as Partial<FormConfig>) };
+  } catch {
+    return DEFAULT_CFG;
+  }
+}
+
 function Fiche({ params, accent }: { params: URLSearchParams; accent: string }) {
   const org = params.get("org") || "";
   const to = params.get("to") || "";
   const app = params.get("app") || "";
-  const cfg = useMemo<FormConfig>(() => {
-    try {
-      const raw = params.get("cfg");
-      return raw ? { ...DEFAULT_CFG, ...b64urlDecode<FormConfig>(raw) } : DEFAULT_CFG;
-    } catch {
-      return DEFAULT_CFG;
-    }
-  }, [params]);
+  const cfg = useMemo<FormConfig>(() => decodeCfg(params.get("cfg")), [params]);
 
   const [f, setF] = useState({
     name: "",
@@ -267,19 +281,28 @@ function Fiche({ params, accent }: { params: URLSearchParams; accent: string }) 
       signature: f.signature.trim() || undefined,
     };
 
-    const receptionLink = app ? `${app}#reception=${b64urlEncode(sub)}` : "";
+    // Soumission encodée en clés compactes pour réduire la taille du lien de réception
+    const subCompact = {
+      a: sub.createdAt,
+      ft: sub.formTitle,
+      n: sub.name,
+      p: sub.phone,
+      e: sub.email,
+      ct: sub.city,
+      st: sub.structure,
+      fn: sub.fonction,
+      i: sub.interests,
+      r: sub.recontact,
+      no: sub.notes,
+      si: sub.signature,
+    };
+    const receptionLink = app ? `${app}#reception=${b64urlEncode(subCompact)}` : "";
+    // Message court : les détails complets sont dans le lien de réception
     const msg =
-      `Nouvelle réponse — ${cfg.title}${org ? ` (${org})` : ""}\n\n` +
-      `Nom : ${sub.name}\n` +
-      `Téléphone : ${sub.phone}\n` +
-      (sub.email ? `Email : ${sub.email}\n` : "") +
-      (sub.city ? `Ville : ${sub.city}\n` : "") +
-      (sub.structure ? `Structure : ${sub.structure}\n` : "") +
-      (sub.fonction ? `Fonction : ${sub.fonction}\n` : "") +
-      (interests.length ? `Intérêts : ${interests.join(", ")}\n` : "") +
-      (recontact.length ? `Recontact : ${recontact.join(", ")}\n` : "") +
-      (sub.notes ? `Notes : ${sub.notes}\n` : "") +
-      (receptionLink ? `\nAjouter à mon tableau de bord : ${receptionLink}` : "");
+      `Réponse — ${org || cfg.title}\n` +
+      `${sub.name} · ${sub.phone}` +
+      (sub.city ? ` · ${sub.city}` : "") +
+      (receptionLink ? `\n${receptionLink}` : "");
 
     window.location.href = whatsappLink(to, msg);
   }

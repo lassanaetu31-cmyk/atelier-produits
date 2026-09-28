@@ -33,6 +33,17 @@ export async function saveFormConfig(cfg: FormConfig): Promise<void> {
   await db.forms.put({ ...cfg, id: 1 });
 }
 
+/** Encode la config en format compact (clés courtes) pour limiter la taille de l'URL. */
+function compactCfg(cfg: FormConfig): Record<string, unknown> {
+  const c: Record<string, unknown> = { t: cfg.title };
+  if (cfg.subtitle) c.u = cfg.subtitle;
+  c.i = cfg.interests;
+  c.r = cfg.recontact;
+  if (!cfg.askStructure) c.s = 0;
+  c.c = cfg.consentText;
+  return c;
+}
+
 /** Lien public du formulaire en ligne (à partager). Embarque la config + le retour dashboard. */
 export function ficheLink(profile: CompanyProfile, cfg: FormConfig): string | null {
   if (!portalReady(profile)) return null;
@@ -41,8 +52,7 @@ export function ficheLink(profile: CompanyProfile, cfg: FormConfig): string | nu
   url.searchParams.set("org", profile.name);
   url.searchParams.set("to", profile.whatsappPhone!.trim());
   if (profile.accentColor) url.searchParams.set("accent", profile.accentColor.replace("#", ""));
-  url.searchParams.set("cfg", b64urlEncode(cfg));
-  // Lien de réception : n'a de sens que si l'app opérateur tourne sur le web (https).
+  url.searchParams.set("cfg", b64urlEncode(compactCfg(cfg)));
   if (typeof location !== "undefined" && /^https?:$/.test(location.protocol)) {
     url.searchParams.set("app", location.origin + location.pathname);
   }

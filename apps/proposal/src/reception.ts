@@ -24,6 +24,27 @@ async function store(sub: Submission): Promise<boolean> {
   return true;
 }
 
+/** Normalise un payload compact (clés courtes) ou complet en Submission. */
+function normalize(raw: Record<string, unknown>): Submission {
+  if ("n" in raw) {
+    return {
+      createdAt: (raw.a as number) || Date.now(),
+      formTitle: (raw.ft as string) || "",
+      name: (raw.n as string) || "Sans nom",
+      phone: raw.p as string | undefined,
+      email: raw.e as string | undefined,
+      city: raw.ct as string | undefined,
+      structure: raw.st as string | undefined,
+      fonction: raw.fn as string | undefined,
+      interests: (raw.i as string[]) || [],
+      recontact: (raw.r as string[]) || [],
+      notes: raw.no as string | undefined,
+      signature: raw.si as string | undefined,
+    };
+  }
+  return raw as unknown as Submission;
+}
+
 /** Extrait un payload de réception d'un texte collé (lien complet ou code brut). */
 function extractPayload(raw: string): string | null {
   const s = raw.trim();
@@ -38,7 +59,7 @@ export async function importPasted(raw: string): Promise<boolean> {
   const payload = extractPayload(raw);
   if (!payload) return false;
   try {
-    return await store(b64urlDecode<Submission>(payload));
+    return await store(normalize(b64urlDecode<Record<string, unknown>>(payload)));
   } catch {
     return false;
   }
@@ -54,7 +75,7 @@ export async function importFromHash(): Promise<boolean> {
   if (!m) return false;
   let ok = false;
   try {
-    ok = await store(b64urlDecode<Submission>(m[1]));
+    ok = await store(normalize(b64urlDecode<Record<string, unknown>>(m[1])));
   } catch {
     ok = false;
   }
