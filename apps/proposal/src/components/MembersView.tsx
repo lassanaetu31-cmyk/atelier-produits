@@ -15,6 +15,7 @@ import {
   type DerivedStatus,
 } from "../members";
 import type { Member } from "../types";
+import { useLang } from "../i18n/context";
 
 const EMPTY: Omit<Member, "createdAt"> = {
   matricule: "",
@@ -26,15 +27,10 @@ const EMPTY: Omit<Member, "createdAt"> = {
   paid: false,
 };
 
-type Filter = "Tous" | "Payé" | "Non payé";
-
-const BADGE: Record<DerivedStatus, string> = {
-  "Payé": "bg-green-100 text-green-700",
-  "En retard": "bg-red-100 text-red-600",
-  "Non payé": "bg-amber-100 text-amber-700",
-};
+type Filter = "all" | "paid" | "unpaid";
 
 export default function MembersView() {
+  const { t } = useLang();
   const profile = useProfile();
   const members = useLiveQuery<Member[], Member[]>(
     () => db.members.orderBy("name").toArray(),
@@ -42,12 +38,30 @@ export default function MembersView() {
     [],
   );
   const [form, setForm] = useState<Omit<Member, "createdAt">>(EMPTY);
-  const [filter, setFilter] = useState<Filter>("Tous");
+  const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
   const [msg, setMsg] = useState("");
   const [copied, setCopied] = useState(false);
 
   const inscription = inscriptionLink(profile, ["Mensuel", "Trimestriel", "Annuel"]);
+
+  const BADGE: Record<DerivedStatus, string> = {
+    "Payé": "bg-green-100 text-green-700",
+    "En retard": "bg-red-100 text-red-600",
+    "Non payé": "bg-amber-100 text-amber-700",
+  };
+
+  const statusLabel: Record<DerivedStatus, string> = {
+    "Payé": t("members.statusPaid"),
+    "En retard": t("members.statusLate"),
+    "Non payé": t("members.statusUnpaid"),
+  };
+
+  const FILTERS: { key: Filter; label: string }[] = [
+    { key: "all", label: t("members.filter.all") },
+    { key: "paid", label: t("members.filter.paid") },
+    { key: "unpaid", label: t("members.filter.unpaid") },
+  ];
 
   async function copyLink() {
     if (!inscription) return;
@@ -56,7 +70,7 @@ export default function MembersView() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      window.prompt("Copiez ce lien :", inscription);
+      window.prompt(t("members.copyPrompt"), inscription);
     }
   }
 
@@ -65,8 +79,8 @@ export default function MembersView() {
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     return members.filter((m) => {
-      if (filter === "Payé" && !m.paid) return false;
-      if (filter === "Non payé" && m.paid) return false;
+      if (filter === "paid" && !m.paid) return false;
+      if (filter === "unpaid" && m.paid) return false;
       if (!q) return true;
       return [m.matricule, m.name, m.email, m.city].some((v) =>
         (v ?? "").toLowerCase().includes(q),
@@ -98,13 +112,16 @@ export default function MembersView() {
     try {
       const list = parseMembersCsv(await file.text());
       if (list.length === 0) {
-        setMsg("Aucun adhérent trouvé dans le fichier.");
+        setMsg(t("members.importNone"));
         return;
       }
       const { added, skipped } = await addMembers(list);
-      setMsg(`${added} adhérent(s) importé(s)${skipped ? `, ${skipped} ignoré(s) (doublons/vides)` : ""}.`);
+      setMsg(
+        t("members.importOk", { added }) +
+        (skipped ? t("members.importSkipped", { skipped }) : "") + ".",
+      );
     } catch {
-      setMsg("Fichier illisible. Utilisez un CSV (matricule, nom, email, ville, type, expire, statut).");
+      setMsg(t("members.importBad"));
     }
   }
 
@@ -113,75 +130,77 @@ export default function MembersView() {
       kind === "csv"
         ? await exportMembersCsv()
         : kind === "pdf"
-          ? await exportMembersPdf(`${profile.name} — Adhérents`, profile.accentColor)
+          ? await exportMembersPdf(`${profile.name} — ${t("members.title")}`, profile.accentColor)
           : await exportMembersJson();
-    if (n === 0) setMsg("Aucun adhérent à exporter.");
+    if (n === 0) setMsg(t("members.exportNone"));
   }
+
+  const activeFilterLabel = FILTERS.find((f) => f.key === filter)?.label ?? "";
 
   return (
     <div className="grid gap-6">
-      {/* Statistiques */}
+      {/* Stats */}
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Adhérents" value={stats.total} tone="slate" />
-        <StatCard label="À jour" value={stats.upToDate} tone="green" />
-        <StatCard label="En retard" value={stats.late} tone="red" />
-        <StatCard label="Taux de recouvrement" value={`${stats.recoveryRate}%`} tone="blue" />
+        <StatCard label={t("members.statsTotal")} value={stats.total} tone="slate" />
+        <StatCard label={t("members.statsUpToDate")} value={stats.upToDate} tone="green" />
+        <StatCard label={t("members.statsLate")} value={stats.late} tone="red" />
+        <StatCard label={t("members.statsRecovery")} value={`${stats.recoveryRate}%`} tone="blue" />
       </section>
 
-      {/* Recherche + filtres */}
+      {/* Search + filters */}
       <section className="flex flex-wrap items-center gap-3">
         <input
           className="min-w-[220px] flex-1 rounded-lg border px-3 py-2 text-sm"
-          placeholder="Rechercher (nom, matricule, email, ville…)"
+          placeholder={t("members.search")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
         <div className="flex gap-1">
-          {(["Tous", "Payé", "Non payé"] as Filter[]).map((f) => (
+          {FILTERS.map((f) => (
             <button
-              key={f}
+              key={f.key}
               className={`rounded-lg px-3 py-2 text-sm font-medium ${
-                filter === f ? "bg-blue-100 text-blue-700" : "text-slate-500 hover:bg-slate-100"
+                filter === f.key ? "bg-blue-100 text-blue-700" : "text-slate-500 hover:bg-slate-100"
               }`}
-              onClick={() => setFilter(f)}
+              onClick={() => setFilter(f.key)}
             >
-              {f}
+              {f.label}
             </button>
           ))}
         </div>
       </section>
 
-      {/* Formulaire ajout / édition */}
+      {/* Add / edit form */}
       <section className="grid gap-3 rounded-xl border bg-white p-5">
-        <h2 className="font-semibold">{form.id ? "Modifier l'adhérent" : "Nouvel adhérent"}</h2>
+        <h2 className="font-semibold">{form.id ? t("members.editTitle") : t("members.newTitle")}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Matricule"
+            placeholder={t("members.colMatricule")}
             value={form.matricule}
             onChange={(e) => patch({ matricule: e.target.value })}
           />
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Nom / Prénom *"
+            placeholder={t("members.name")}
             value={form.name}
             onChange={(e) => patch({ name: e.target.value })}
           />
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Email"
+            placeholder={t("members.email")}
             value={form.email ?? ""}
             onChange={(e) => patch({ email: e.target.value })}
           />
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Ville"
+            placeholder={t("members.city")}
             value={form.city ?? ""}
             onChange={(e) => patch({ city: e.target.value })}
           />
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Type (Mensuel, Annuel…)"
+            placeholder={t("members.typePlaceholder")}
             list="member-types"
             value={form.type}
             onChange={(e) => patch({ type: e.target.value })}
@@ -192,7 +211,7 @@ export default function MembersView() {
             <option value="Annuel" />
           </datalist>
           <label className="text-xs text-slate-500">
-            Expire le
+            {t("members.expires")}
             <input
               className="mt-0.5 w-full rounded border px-3 py-1.5 text-sm"
               type="date"
@@ -208,41 +227,41 @@ export default function MembersView() {
               checked={form.paid}
               onChange={(e) => patch({ paid: e.target.checked })}
             />
-            Cotisation réglée
+            {t("members.paidCheckbox")}
           </label>
           <button
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
             onClick={submit}
           >
-            {form.id ? "Enregistrer" : "Ajouter"}
+            {form.id ? t("members.saveBtn") : t("members.addBtn")}
           </button>
           {form.id && (
             <button className="text-sm text-slate-500 hover:underline" onClick={() => setForm(EMPTY)}>
-              Annuler
+              {t("members.cancel")}
             </button>
           )}
         </div>
       </section>
 
-      {/* Tableau */}
+      {/* Table */}
       <section className="overflow-x-auto rounded-xl border bg-white">
         <div className="border-b px-5 py-3 text-sm font-semibold text-slate-500">
-          {visible.length} adhérent{visible.length > 1 ? "s" : ""}
-          {filter !== "Tous" && <span className="text-slate-400"> · filtre {filter}</span>}
+          {t("members.countLabel", { count: visible.length })}
+          {filter !== "all" && <span className="text-slate-400">{t("members.activeFilter", { filter: activeFilterLabel })}</span>}
         </div>
         {visible.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-slate-400">Aucun adhérent.</p>
+          <p className="px-5 py-6 text-sm text-slate-400">{t("members.empty")}</p>
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-400">
               <tr>
-                <th className="px-4 py-2">Matricule</th>
-                <th className="px-4 py-2">Nom / Prénom</th>
-                <th className="px-4 py-2">Ville</th>
-                <th className="px-4 py-2">Type</th>
-                <th className="px-4 py-2">Expire</th>
-                <th className="px-4 py-2">Statut</th>
-                <th className="px-4 py-2 text-right">Action</th>
+                <th className="px-4 py-2">{t("members.colMatricule")}</th>
+                <th className="px-4 py-2">{t("members.colName")}</th>
+                <th className="px-4 py-2">{t("members.colCity")}</th>
+                <th className="px-4 py-2">{t("members.colType")}</th>
+                <th className="px-4 py-2">{t("members.colExpires")}</th>
+                <th className="px-4 py-2">{t("members.colStatus")}</th>
+                <th className="px-4 py-2 text-right">{t("members.colAction")}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -259,7 +278,9 @@ export default function MembersView() {
                     <td className="px-4 py-2 text-slate-500">{m.type || "—"}</td>
                     <td className="px-4 py-2 text-slate-500">{m.expiresAt || "—"}</td>
                     <td className="px-4 py-2">
-                      <span className={`rounded px-2 py-0.5 text-xs font-medium ${BADGE[st]}`}>{st}</span>
+                      <span className={`rounded px-2 py-0.5 text-xs font-medium ${BADGE[st]}`}>
+                        {statusLabel[st]}
+                      </span>
                     </td>
                     <td className="px-4 py-2">
                       <div className="flex justify-end gap-3">
@@ -267,16 +288,16 @@ export default function MembersView() {
                           className={m.paid ? "text-amber-600 hover:underline" : "text-green-600 hover:underline"}
                           onClick={() => togglePaid(m)}
                         >
-                          {m.paid ? "Marquer non payé" : "Marquer payé"}
+                          {m.paid ? t("members.markUnpaid") : t("members.markPaid")}
                         </button>
                         <button className="text-blue-600 hover:underline" onClick={() => setForm(m)}>
-                          Modifier
+                          {t("members.edit")}
                         </button>
                         <button
                           className="text-red-500 hover:underline"
                           onClick={() => m.id && db.members.delete(m.id)}
                         >
-                          Suppr.
+                          {t("members.delete")}
                         </button>
                       </div>
                     </td>
@@ -288,15 +309,12 @@ export default function MembersView() {
         )}
       </section>
 
-      {/* Lien d'inscription public */}
+      {/* Registration link */}
       <section className="grid gap-3 rounded-xl border bg-white p-5">
-        <h2 className="font-semibold">Lien d'inscription public</h2>
+        <h2 className="font-semibold">{t("members.linkTitle")}</h2>
         {portalReady(profile) ? (
           <>
-            <p className="-mt-1 text-xs text-slate-400">
-              Partagez ce lien (bio, statut WhatsApp, flyer, QR). Vos adhérents s'inscrivent sans
-              rien installer — leur inscription vous arrive par WhatsApp, à recopier ici.
-            </p>
+            <p className="-mt-1 text-xs text-slate-400">{t("members.linkDesc")}</p>
             <div className="flex flex-wrap items-center gap-2">
               <input
                 readOnly
@@ -308,7 +326,7 @@ export default function MembersView() {
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                 onClick={copyLink}
               >
-                {copied ? "Copié ✓" : "Copier le lien"}
+                {copied ? t("members.copied") : t("members.copy")}
               </button>
               <a
                 className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50"
@@ -316,28 +334,22 @@ export default function MembersView() {
                 target="_blank"
                 rel="noreferrer"
               >
-                Tester
+                {t("members.testLink")}
               </a>
             </div>
           </>
         ) : (
-          <p className="-mt-1 text-xs text-slate-400">
-            Renseignez votre numéro WhatsApp et l'URL du portail dans l'onglet{" "}
-            <span className="font-medium">Profil</span> pour activer le lien d'inscription public.
-          </p>
+          <p className="-mt-1 text-xs text-slate-400">{t("members.noPortal")}</p>
         )}
       </section>
 
-      {/* Fichier de suivi */}
+      {/* Import / export */}
       <section className="grid gap-3 rounded-xl border bg-white p-5">
-        <h2 className="font-semibold">Fichier de suivi</h2>
-        <p className="-mt-1 text-xs text-slate-400">
-          Saisissez vos adhérents à la main, ou importez un CSV. Exportez la liste à jour quand vous
-          voulez. Tout reste sur cet appareil.
-        </p>
+        <h2 className="font-semibold">{t("members.trackingTitle")}</h2>
+        <p className="-mt-1 text-xs text-slate-400">{t("members.trackingDesc")}</p>
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <label className="cursor-pointer rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50">
-            Importer un CSV
+            {t("members.importCsv")}
             <input
               type="file"
               accept=".csv,text/csv"
@@ -352,22 +364,22 @@ export default function MembersView() {
             className="rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50"
             onClick={() => onExport("csv")}
           >
-            Exporter CSV
+            {t("members.exportCsv")}
           </button>
           <button
             className="rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50"
             onClick={() => onExport("pdf")}
           >
-            Télécharger PDF
+            {t("members.exportPdfLabel")}
           </button>
           <button
             className="rounded-lg bg-amber-500 px-4 py-2 font-semibold text-white hover:bg-amber-600"
             onClick={() => onExport("json")}
           >
-            Télécharger adhérents.json
+            {t("members.exportJsonLabel")}
           </button>
           <button className="text-slate-500 hover:underline" onClick={downloadMembersTemplate}>
-            Modèle CSV
+            {t("members.downloadTemplate")}
           </button>
         </div>
         {msg && <p className="text-sm font-medium text-green-600">{msg}</p>}

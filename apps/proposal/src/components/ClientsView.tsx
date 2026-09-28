@@ -9,10 +9,12 @@ import {
   parseVcfClients,
 } from "../clients-import";
 import type { Client } from "../types";
+import { useLang } from "../i18n/context";
 
 const EMPTY: Omit<Client, "createdAt"> = { name: "", phone: "", email: "", address: "" };
 
 export default function ClientsView() {
+  const { t } = useLang();
   const clients = useLiveQuery(() => db.clients.orderBy("name").toArray(), [], []);
   const [form, setForm] = useState<Omit<Client, "createdAt">>(EMPTY);
   const [msg, setMsg] = useState("");
@@ -35,32 +37,32 @@ export default function ClientsView() {
       const isVcf = /\.vcf$/i.test(file.name) || text.toUpperCase().includes("BEGIN:VCARD");
       const contacts = isVcf ? parseVcfClients(text) : parseCsvClients(text);
       if (contacts.length === 0) {
-        setMsg("Aucun contact trouvé dans le fichier.");
+        setMsg(t("clients.importNone"));
         return;
       }
       const { added, skipped } = await addContacts(contacts);
-      setMsg(`${added} client(s) importé(s)${skipped ? `, ${skipped} ignoré(s) (doublons/vides)` : ""}.`);
+      setMsg(
+        t("clients.importOk", { added }) +
+        (skipped ? t("clients.importSkipped", { skipped }) : "") + ".",
+      );
     } catch {
-      setMsg("Fichier illisible. Utilisez un CSV ou un fichier de contacts .vcf.");
+      setMsg(t("clients.importBad"));
     }
   }
 
   async function onExport() {
     const n = await exportClientsCsv();
-    setMsg(n === 0 ? "Aucun client à exporter." : `${n} client(s) exporté(s).`);
+    setMsg(n === 0 ? t("clients.exportNone") : t("clients.exportOk", { n }));
   }
 
   return (
     <div className="grid gap-6">
       <section className="grid gap-3 rounded-xl border bg-white p-5">
-        <h2 className="font-semibold">Importer des clients</h2>
-        <p className="-mt-1 text-xs text-slate-400">
-          Fichier CSV (nom, téléphone, email, adresse) ou fichier de contacts .vcf exporté depuis
-          votre téléphone. Les clients sont créés automatiquement, sans doublons.
-        </p>
+        <h2 className="font-semibold">{t("clients.title")}</h2>
+        <p className="-mt-1 text-xs text-slate-400">{t("clients.importDesc")}</p>
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <label className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700">
-            Importer CSV / contacts
+            {t("clients.import")}
             <input
               type="file"
               accept=".csv,.vcf,text/csv,text/vcard,text/x-vcard"
@@ -75,39 +77,39 @@ export default function ClientsView() {
             className="rounded-lg border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50"
             onClick={onExport}
           >
-            Exporter CSV
+            {t("clients.export")}
           </button>
           <button className="text-slate-500 hover:underline" onClick={downloadCsvTemplate}>
-            Télécharger un modèle CSV
+            {t("clients.template")}
           </button>
         </div>
         {msg && <p className="text-sm font-medium text-green-600">{msg}</p>}
       </section>
 
       <section className="grid gap-3 rounded-xl border bg-white p-5">
-        <h2 className="font-semibold">{form.id ? "Modifier le client" : "Nouveau client"}</h2>
+        <h2 className="font-semibold">{form.id ? t("clients.editTitle") : t("clients.newTitle")}</h2>
         <div className="grid grid-cols-2 gap-3">
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Nom *"
+            placeholder={t("clients.name")}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Téléphone"
+            placeholder={t("clients.phone")}
             value={form.phone ?? ""}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
           />
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Email"
+            placeholder={t("clients.email")}
             value={form.email ?? ""}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
           <input
             className="rounded border px-3 py-2 text-sm"
-            placeholder="Adresse"
+            placeholder={t("clients.address")}
             value={form.address ?? ""}
             onChange={(e) => setForm({ ...form, address: e.target.value })}
           />
@@ -117,11 +119,11 @@ export default function ClientsView() {
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
             onClick={submit}
           >
-            {form.id ? "Enregistrer" : "Ajouter"}
+            {form.id ? t("clients.saveBtn") : t("clients.add")}
           </button>
           {form.id && (
             <button className="text-sm text-slate-500 hover:underline" onClick={() => setForm(EMPTY)}>
-              Annuler
+              {t("clients.cancel")}
             </button>
           )}
         </div>
@@ -129,10 +131,10 @@ export default function ClientsView() {
 
       <section className="rounded-xl border bg-white">
         <div className="border-b px-5 py-3 text-sm font-semibold text-slate-500">
-          {clients.length} client{clients.length > 1 ? "s" : ""}
+          {t("clients.countLabel", { count: clients.length })}
         </div>
         {clients.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-slate-400">Aucun client enregistré.</p>
+          <p className="px-5 py-6 text-sm text-slate-400">{t("clients.empty")}</p>
         ) : (
           <ul className="divide-y">
             {clients.map((c) => (
@@ -145,13 +147,13 @@ export default function ClientsView() {
                 </div>
                 <div className="flex gap-3 text-sm">
                   <button className="text-blue-600 hover:underline" onClick={() => setForm(c)}>
-                    Modifier
+                    {t("clients.edit")}
                   </button>
                   <button
                     className="text-red-500 hover:underline"
                     onClick={() => c.id && db.clients.delete(c.id)}
                   >
-                    Supprimer
+                    {t("clients.delete")}
                   </button>
                 </div>
               </li>
