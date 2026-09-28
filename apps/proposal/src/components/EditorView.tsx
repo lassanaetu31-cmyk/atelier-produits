@@ -5,22 +5,24 @@ import { db } from "../db";
 import { downloadPdf, nextNumber, proposalWhatsappLink, totalsOf } from "../proposal";
 import { acceptLink } from "../portal-links";
 import { useProfile } from "../profile";
-import { EXTRA_SECTIONS, SECTION_VARIANTS, TEMPLATES } from "../templates";
+import { getExtraSections, getSectionVariants, getTemplates } from "../templates-i18n";
 import type { ProposalStatus, SavedProposal } from "../types";
+import { useLang } from "../i18n/context";
 
 const CURRENCY: Currency = "XOF";
 const STATUSES: ProposalStatus[] = ["Brouillon", "Envoyée", "Acceptée", "Refusée"];
 
-function blankDraft(): SavedProposal {
-  const t = TEMPLATES[0];
+function blankDraft(lang: string): SavedProposal {
+  const templates = getTemplates(lang as never);
+  const tmpl = templates[0];
   return {
     number: "",
     title: "",
     clientName: "",
     fromName: "",
     currency: CURRENCY,
-    sections: t.sections.map((s) => ({ ...s })),
-    services: t.services.map((s) => ({ ...s })),
+    sections: tmpl.sections.map((s) => ({ ...s })),
+    services: tmpl.services.map((s) => ({ ...s })),
     tiers: [],
     taxRate: 0,
     discountRate: 0,
@@ -40,10 +42,22 @@ export default function EditorView({
   initial: SavedProposal | null;
   onSaved: () => void;
 }) {
+  const { t, lang } = useLang();
   const clients = useLiveQuery(() => db.clients.orderBy("name").toArray(), [], []);
   const profile = useProfile();
-  const [draft, setDraft] = useState<SavedProposal>(initial ?? blankDraft());
+  const [draft, setDraft] = useState<SavedProposal>(initial ?? blankDraft(lang));
   const [flash, setFlash] = useState("");
+
+  const TEMPLATES = useMemo(() => getTemplates(lang), [lang]);
+  const EXTRA_SECTIONS = useMemo(() => getExtraSections(lang), [lang]);
+  const SECTION_VARIANTS = useMemo(() => getSectionVariants(lang), [lang]);
+
+  const statusLabel: Record<ProposalStatus, string> = {
+    Brouillon: t("status.draft"),
+    Envoyée: t("status.sent"),
+    Acceptée: t("status.accepted"),
+    Refusée: t("status.refused"),
+  };
 
   const totals = useMemo(() => totalsOf(draft), [draft]);
   const selectedClient = clients.find((c) => c.id === draft.clientId);
@@ -53,23 +67,22 @@ export default function EditorView({
   }
 
   function applyTemplate(id: string) {
-    const t = TEMPLATES.find((x) => x.id === id);
-    if (!t) return;
+    const tmpl = TEMPLATES.find((x) => x.id === id);
+    if (!tmpl) return;
     setDraft((d) => ({
       ...d,
-      title: t.title,
-      sections: t.sections.map((s) => ({ ...s })),
-      services: t.services.map((s) => ({ ...s })),
-      tiers: (t.tiers ?? []).map((x) => ({ ...x, features: [...x.features] })),
+      title: tmpl.title,
+      sections: tmpl.sections.map((s) => ({ ...s })),
+      services: tmpl.services.map((s) => ({ ...s })),
+      tiers: (tmpl.tiers ?? []).map((x) => ({ ...x, features: [...x.features] })),
     }));
   }
 
-  // -------- sections --------
   function updateSection(i: number, p: Partial<{ title: string; body: string }>) {
     setDraft((d) => ({ ...d, sections: d.sections.map((s, idx) => (idx === i ? { ...s, ...p } : s)) }));
   }
   function addSection() {
-    setDraft((d) => ({ ...d, sections: [...d.sections, { title: "Section", body: "" }] }));
+    setDraft((d) => ({ ...d, sections: [...d.sections, { title: t("editor.newSectionTitle"), body: "" }] }));
   }
   function addSuggestedSection(i: number) {
     const s = EXTRA_SECTIONS[i];
@@ -80,7 +93,6 @@ export default function EditorView({
     setDraft((d) => ({ ...d, sections: d.sections.filter((_, idx) => idx !== i) }));
   }
 
-  // -------- services --------
   function updateItem(i: number, p: Partial<LineItem>) {
     setDraft((d) => ({ ...d, services: d.services.map((it, idx) => (idx === i ? { ...it, ...p } : it)) }));
   }
@@ -91,12 +103,11 @@ export default function EditorView({
     setDraft((d) => ({ ...d, services: d.services.filter((_, idx) => idx !== i) }));
   }
 
-  // -------- tiers (formules) --------
   function addTier() {
-    setDraft((d) => ({ ...d, tiers: [...d.tiers, { name: "Formule", price: 0, features: [] }] }));
+    setDraft((d) => ({ ...d, tiers: [...d.tiers, { name: t("editor.tierDefault"), price: 0, features: [] }] }));
   }
   function updateTier(i: number, p: Partial<{ name: string; price: number; features: string[]; highlighted: boolean }>) {
-    setDraft((d) => ({ ...d, tiers: d.tiers.map((t, idx) => (idx === i ? { ...t, ...p } : t)) }));
+    setDraft((d) => ({ ...d, tiers: d.tiers.map((tier, idx) => (idx === i ? { ...tier, ...p } : tier)) }));
   }
   function removeTier(i: number) {
     setDraft((d) => ({ ...d, tiers: d.tiers.filter((_, idx) => idx !== i) }));
@@ -123,7 +134,7 @@ export default function EditorView({
 
   async function save() {
     await persist();
-    setFlash("Enregistré dans l'historique ✓");
+    setFlash(t("editor.saved"));
     setTimeout(() => setFlash(""), 2500);
     onSaved();
   }
@@ -134,7 +145,7 @@ export default function EditorView({
 
   async function sendWhatsApp() {
     if (!selectedClient?.phone) {
-      setFlash("Sélectionnez un client enregistré avec un numéro de téléphone.");
+      setFlash(t("editor.noPhone"));
       setTimeout(() => setFlash(""), 3000);
       return;
     }
@@ -148,10 +159,10 @@ export default function EditorView({
 
   return (
     <div className="grid gap-6">
-      {/* En-tête : modèle + méta */}
+      {/* Header: template + meta */}
       <section className="grid gap-4 rounded-xl border bg-white p-5">
         <label className="text-sm">
-          Partir d'un modèle métier <span className="text-slate-400">(remplit tout en 1 clic)</span>
+          {t("editor.template")} <span className="text-slate-400">{t("editor.templateHint")}</span>
           <select
             className="mt-1 w-full rounded border bg-white px-3 py-2"
             defaultValue=""
@@ -160,20 +171,20 @@ export default function EditorView({
               e.target.value = "";
             }}
           >
-            <option value="">— Choisir un modèle —</option>
-            {TEMPLATES.filter((t) => t.id !== "blank").map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.label}
+            <option value="">{t("editor.chooseTemplate")}</option>
+            {TEMPLATES.filter((tmpl) => tmpl.id !== "blank").map((tmpl) => (
+              <option key={tmpl.id} value={tmpl.id}>
+                {tmpl.label}
               </option>
             ))}
           </select>
         </label>
 
         <label className="text-sm">
-          Titre du projet
+          {t("editor.projectTitle")}
           <input
             className="mt-1 w-full rounded border px-3 py-2"
-            placeholder="Ex. Création de votre site web"
+            placeholder={t("editor.projectPlaceholder")}
             value={draft.title}
             onChange={(e) => patch({ title: e.target.value })}
           />
@@ -181,16 +192,16 @@ export default function EditorView({
 
         <div className="grid grid-cols-2 gap-4">
           <label className="text-sm">
-            Numéro
+            {t("editor.number")}
             <input
               className="mt-1 w-full rounded border px-3 py-2"
-              placeholder="Auto à l'enregistrement"
+              placeholder={t("editor.numberAuto")}
               value={draft.number}
               onChange={(e) => patch({ number: e.target.value })}
             />
           </label>
           <label className="text-sm">
-            Statut
+            {t("editor.status")}
             <select
               className="mt-1 w-full rounded border bg-white px-3 py-2"
               value={draft.status}
@@ -198,7 +209,7 @@ export default function EditorView({
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {s}
+                  {statusLabel[s]}
                 </option>
               ))}
             </select>
@@ -206,18 +217,18 @@ export default function EditorView({
         </div>
 
         <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
-          <span className="text-slate-500">Prestataire</span>
+          <span className="text-slate-500">{t("editor.provider")}</span>
           <span className="font-medium">{profile.name}</span>
         </div>
 
         <label className="text-sm">
-          Client
+          {t("editor.client")}
           <select
             className="mt-1 w-full rounded border bg-white px-3 py-2"
             value={draft.clientId ?? ""}
             onChange={(e) => pickClient(e.target.value)}
           >
-            <option value="">— Saisie libre —</option>
+            <option value="">{t("editor.freeEntry")}</option>
             {clients.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -227,7 +238,7 @@ export default function EditorView({
         </label>
         {draft.clientId === undefined && (
           <label className="text-sm">
-            Nom du client
+            {t("editor.clientName")}
             <input
               className="mt-1 w-full rounded border px-3 py-2"
               value={draft.clientName}
@@ -237,9 +248,9 @@ export default function EditorView({
         )}
       </section>
 
-      {/* Sections narratives */}
+      {/* Narrative sections */}
       <section className="grid gap-4 rounded-xl border bg-white p-5">
-        <h2 className="font-semibold">Sections de la proposition</h2>
+        <h2 className="font-semibold">{t("editor.sections")}</h2>
         {draft.sections.map((s, i) => (
           <div key={i} className="grid gap-2 rounded-lg border border-slate-100 bg-slate-50/50 p-3">
             <div className="flex items-center gap-2">
@@ -252,17 +263,17 @@ export default function EditorView({
                 <select
                   className="rounded border bg-white px-2 py-1.5 text-xs text-slate-500"
                   defaultValue=""
-                  title="Choisir un texte proposé"
+                  title={t("editor.chooseSuggested")}
                   onChange={(e) => {
                     const v = Number(e.target.value);
                     if (!Number.isNaN(v)) updateSection(i, { body: SECTION_VARIANTS[s.title][v] });
                     e.target.value = "";
                   }}
                 >
-                  <option value="">Textes proposés…</option>
-                  {SECTION_VARIANTS[s.title].map((t, vi) => (
+                  <option value="">{t("editor.textSuggestions")}</option>
+                  {SECTION_VARIANTS[s.title].map((text, vi) => (
                     <option key={vi} value={vi}>
-                      Proposition {vi + 1} — {t.replace(/\n/g, " ").slice(0, 40)}…
+                      {vi + 1} — {text.replace(/\n/g, " ").slice(0, 40)}…
                     </option>
                   ))}
                 </select>
@@ -270,7 +281,7 @@ export default function EditorView({
               <button
                 className="rounded bg-red-50 px-2 py-1.5 text-red-500 hover:bg-red-100"
                 onClick={() => removeSection(i)}
-                title="Supprimer la section"
+                title={t("editor.removeSection")}
               >
                 ×
               </button>
@@ -278,7 +289,7 @@ export default function EditorView({
             <textarea
               className="w-full rounded border px-2 py-1.5 text-sm"
               rows={4}
-              placeholder="Rédigez le contenu de cette section…"
+              placeholder={t("editor.sectionPlaceholder")}
               value={s.body}
               onChange={(e) => updateSection(i, { body: e.target.value })}
             />
@@ -286,7 +297,7 @@ export default function EditorView({
         ))}
         <div className="flex flex-wrap items-center gap-3">
           <button className="text-sm text-blue-600 hover:underline" onClick={addSection}>
-            + Section vierge
+            {t("editor.blankSection")}
           </button>
           <select
             className="rounded-lg border bg-white px-3 py-2 text-sm"
@@ -296,7 +307,7 @@ export default function EditorView({
               e.target.value = "";
             }}
           >
-            <option value="">+ Ajouter une section suggérée…</option>
+            <option value="">{t("editor.addSuggestedSection")}</option>
             {EXTRA_SECTIONS.map((s, i) => (
               <option key={s.title} value={i}>
                 {s.title}
@@ -306,28 +317,26 @@ export default function EditorView({
         </div>
       </section>
 
-      {/* Formules (paliers tarifaires) */}
+      {/* Tiers (packages) */}
       <section className="grid gap-3 rounded-xl border bg-white p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">
-            Formules <span className="text-xs font-normal text-slate-400">(optionnel — offre à 3 choix)</span>
+            {t("editor.tiers")} <span className="text-xs font-normal text-slate-400">{t("editor.tiersHint")}</span>
           </h2>
           <button className="text-sm text-blue-600 hover:underline" onClick={addTier} disabled={draft.tiers.length >= 3}>
-            + Formule
+            {t("editor.addTier")}
           </button>
         </div>
         {draft.tiers.length === 0 ? (
-          <p className="text-xs text-slate-400">
-            Ajoutez 2 ou 3 formules (Essentiel / Pro / Premium) : le client choisit, votre panier moyen monte.
-          </p>
+          <p className="text-xs text-slate-400">{t("editor.tiersEmpty")}</p>
         ) : (
           <div className="grid gap-3 sm:grid-cols-3">
-            {draft.tiers.map((t, i) => (
+            {draft.tiers.map((tier, i) => (
               <div key={i} className="grid gap-2 rounded-lg border border-slate-200 p-3">
                 <div className="flex items-center gap-1">
                   <input
                     className="w-full rounded border px-2 py-1 text-sm font-medium"
-                    value={t.name}
+                    value={tier.name}
                     onChange={(e) => updateTier(i, { name: e.target.value })}
                   />
                   <button
@@ -341,23 +350,23 @@ export default function EditorView({
                   className="w-full rounded border px-2 py-1 text-right text-sm"
                   type="number"
                   min={0}
-                  value={t.price}
+                  value={tier.price}
                   onChange={(e) => updateTier(i, { price: Number(e.target.value) })}
                 />
                 <textarea
                   className="w-full rounded border px-2 py-1 text-xs"
                   rows={4}
-                  placeholder="Une caractéristique par ligne"
-                  value={t.features.join("\n")}
+                  placeholder={t("editor.featurePlaceholder")}
+                  value={tier.features.join("\n")}
                   onChange={(e) => updateTier(i, { features: e.target.value.split("\n") })}
                 />
                 <label className="flex items-center gap-2 text-xs text-slate-500">
                   <input
                     type="checkbox"
-                    checked={!!t.highlighted}
+                    checked={!!tier.highlighted}
                     onChange={(e) => updateTier(i, { highlighted: e.target.checked })}
                   />
-                  Mettre en avant
+                  {t("editor.tierHighlight")}
                 </label>
               </div>
             ))}
@@ -365,15 +374,15 @@ export default function EditorView({
         )}
       </section>
 
-      {/* Investissement (services) */}
+      {/* Investment (services) */}
       <section className="grid gap-4 rounded-xl border bg-white p-5">
-        <h2 className="font-semibold">Investissement (détail chiffré)</h2>
+        <h2 className="font-semibold">{t("editor.investment")}</h2>
         <div className="grid gap-2">
           {draft.services.map((it, i) => (
             <div key={i} className="grid grid-cols-[1fr_70px_120px_32px] items-center gap-2">
               <input
                 className="rounded border px-2 py-1.5 text-sm"
-                placeholder="Prestation"
+                placeholder={t("editor.serviceDesc")}
                 value={it.description}
                 onChange={(e) => updateItem(i, { description: e.target.value })}
               />
@@ -400,13 +409,13 @@ export default function EditorView({
             </div>
           ))}
           <button className="justify-self-start text-sm text-blue-600 hover:underline" onClick={addItem}>
-            + Ligne
+            {t("editor.addItem")}
           </button>
         </div>
 
         <div className="flex flex-wrap gap-4 text-sm">
           <label>
-            Remise (%)
+            {t("editor.discount")}
             <input
               className="ml-2 w-20 rounded border px-2 py-1"
               type="number"
@@ -417,7 +426,7 @@ export default function EditorView({
             />
           </label>
           <label>
-            Taxe (%)
+            {t("editor.tax")}
             <input
               className="ml-2 w-20 rounded border px-2 py-1"
               type="number"
@@ -427,7 +436,7 @@ export default function EditorView({
             />
           </label>
           <label>
-            Acompte (%)
+            {t("editor.deposit")}
             <input
               className="ml-2 w-20 rounded border px-2 py-1"
               type="number"
@@ -438,7 +447,7 @@ export default function EditorView({
             />
           </label>
           <label>
-            Validité (jours)
+            {t("editor.validity")}
             <input
               className="ml-2 w-20 rounded border px-2 py-1"
               type="number"
@@ -452,15 +461,15 @@ export default function EditorView({
 
       <section className="flex items-center justify-between rounded-xl border bg-white p-5">
         <div className="text-sm text-slate-500">
-          Sous-total {formatMoney(totals.subtotal, draft.currency)}
-          {totals.discount > 0 && <> · Remise −{formatMoney(totals.discount, draft.currency)}</>}
-          {totals.tax > 0 && <> · Taxe {formatMoney(totals.tax, draft.currency)}</>}
+          {t("editor.subtotalLabel")} {formatMoney(totals.subtotal, draft.currency)}
+          {totals.discount > 0 && <> · {t("editor.discountLabel")}{formatMoney(totals.discount, draft.currency)}</>}
+          {totals.tax > 0 && <> · {t("editor.taxLabel")} {formatMoney(totals.tax, draft.currency)}</>}
           {draft.depositRate > 0 && (
-            <> · Acompte {formatMoney((totals.total * draft.depositRate) / 100, draft.currency)}</>
+            <> · {t("editor.depositLabel")} {formatMoney((totals.total * draft.depositRate) / 100, draft.currency)}</>
           )}
         </div>
         <div className="text-lg font-bold text-blue-600">
-          Total {formatMoney(totals.total, draft.currency)}
+          {t("editor.totalLabel")} {formatMoney(totals.total, draft.currency)}
         </div>
       </section>
 
@@ -469,21 +478,21 @@ export default function EditorView({
           className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
           onClick={pdf}
         >
-          Télécharger le PDF
+          {t("editor.downloadPdf")}
         </button>
         <button
           className="rounded-xl border border-blue-600 px-5 py-3 font-semibold text-blue-600 hover:bg-blue-50"
           onClick={save}
         >
-          Enregistrer
+          {t("editor.save")}
         </button>
         <button
           className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700 disabled:opacity-40"
           onClick={sendWhatsApp}
           disabled={!selectedClient?.phone}
-          title={selectedClient?.phone ? "" : "Client enregistré avec téléphone requis"}
+          title={selectedClient?.phone ? "" : t("editor.noPhone")}
         >
-          Envoyer par WhatsApp
+          {t("editor.sendWhatsApp")}
         </button>
         {flash && <span className="text-sm font-medium text-green-600">{flash}</span>}
       </div>
