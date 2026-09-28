@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    { "source": "/proposal/(.*)", "destination": "/proposal/index.html" },
+    { "source": "/portal/(.*)", "destination": "/portal/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ]
+}
