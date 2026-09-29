@@ -26,6 +26,7 @@ const T: Record<LangCode, {
   accNameLabel: string;
   accSubmit: string;
   accFooter: string;
+  accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) => string;
   errAccName: string;
   ficheCoords: string;
   ficheNamePhone: string;
@@ -63,6 +64,8 @@ const T: Record<LangCode, {
     accNameLabel: "Votre nom (bon pour accord)",
     accSubmit: "J'accepte cette proposition",
     accFooter: "Votre acceptation est envoyée au prestataire par WhatsApp.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Bonjour ${org},\n\nJ'accepte la proposition « ${title} »${num ? ` (réf. ${num})` : ""}${amount ? `, montant ${amount}` : ""}.\nBon pour accord — ${name}, le ${date}.`,
     errAccName: "Indiquez votre nom pour valider.",
     ficheCoords: "Vos coordonnées",
     ficheNamePhone: "Téléphone *",
@@ -100,6 +103,8 @@ const T: Record<LangCode, {
     accNameLabel: "Your name (acceptance)",
     accSubmit: "I accept this proposal",
     accFooter: "Your acceptance is sent to the provider via WhatsApp.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Hello ${org},\n\nI accept the proposal "${title}"${num ? ` (ref. ${num})` : ""}${amount ? `, amount ${amount}` : ""}.\nAgreed — ${name}, ${date}.`,
     errAccName: "Please enter your name to confirm.",
     ficheCoords: "Your contact details",
     ficheNamePhone: "Phone *",
@@ -137,6 +142,8 @@ const T: Record<LangCode, {
     accNameLabel: "Su nombre (aceptación)",
     accSubmit: "Acepto esta propuesta",
     accFooter: "Su aceptación se envía al proveedor por WhatsApp.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Hola ${org},\n\nAcepto la propuesta "${title}"${num ? ` (ref. ${num})` : ""}${amount ? `, importe ${amount}` : ""}.\nConfirmado — ${name}, ${date}.`,
     errAccName: "Indique su nombre para confirmar.",
     ficheCoords: "Sus datos de contacto",
     ficheNamePhone: "Teléfono *",
@@ -174,6 +181,8 @@ const T: Record<LangCode, {
     accNameLabel: "اسمك (للموافقة)",
     accSubmit: "أقبل هذا العرض",
     accFooter: "تُرسَل موافقتك إلى مقدم الخدمة عبر واتساب.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `مرحباً ${org},\n\nأقبل العرض "${title}"${num ? ` (مرجع: ${num})` : ""}${amount ? `، المبلغ ${amount}` : ""}.\nموافق — ${name}، ${date}.`,
     errAccName: "يُرجى إدخال اسمك للتأكيد.",
     ficheCoords: "بيانات الاتصال",
     ficheNamePhone: "الهاتف *",
@@ -211,6 +220,8 @@ const T: Record<LangCode, {
     accNameLabel: "O seu nome (aceitação)",
     accSubmit: "Aceito esta proposta",
     accFooter: "A sua aceitação é enviada ao prestador pelo WhatsApp.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Olá ${org},\n\nAceito a proposta "${title}"${num ? ` (ref. ${num})` : ""}${amount ? `, montante ${amount}` : ""}.\nConfirmado — ${name}, ${date}.`,
     errAccName: "Indique o seu nome para confirmar.",
     ficheCoords: "Os seus dados de contacto",
     ficheNamePhone: "Telefone *",
@@ -248,6 +259,8 @@ const T: Record<LangCode, {
     accNameLabel: "Ihr Name (Annahme)",
     accSubmit: "Ich akzeptiere dieses Angebot",
     accFooter: "Ihre Annahme wird per WhatsApp an den Anbieter gesendet.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Hallo ${org},\n\nIch akzeptiere das Angebot „${title}"${num ? ` (Ref. ${num})` : ""}${amount ? `, Betrag ${amount}` : ""}.\nBestätigt — ${name}, ${date}.`,
     errAccName: "Bitte geben Sie Ihren Namen zur Bestätigung ein.",
     ficheCoords: "Ihre Kontaktdaten",
     ficheNamePhone: "Telefon *",
@@ -285,6 +298,8 @@ const T: Record<LangCode, {
     accNameLabel: "您的姓名（确认接受）",
     accSubmit: "我接受此提案",
     accFooter: "您的接受确认将通过 WhatsApp 发送给服务提供商。",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `您好 ${org}，\n\n我接受提案"${title}"${num ? `（参考编号：${num}）` : ""}${amount ? `，金额 ${amount}` : ""}。\n确认同意 — ${name}，${date}。`,
     errAccName: "请输入您的姓名以确认。",
     ficheCoords: "您的联系信息",
     ficheNamePhone: "电话 *",
@@ -322,6 +337,8 @@ const T: Record<LangCode, {
     accNameLabel: "お名前（承認用）",
     accSubmit: "この提案に同意します",
     accFooter: "承認内容は WhatsApp でプロバイダーに送信されます。",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `${org} 様、\n\n提案「${title}」${num ? `（参照番号：${num}）` : ""}${amount ? `、金額 ${amount}` : ""}に同意します。\n承認 — ${name}、${date}`,
     errAccName: "確認のためお名前を入力してください。",
     ficheCoords: "連絡先情報",
     ficheNamePhone: "電話番号 *",
@@ -359,6 +376,8 @@ const T: Record<LangCode, {
     accNameLabel: "Il tuo nome (accettazione)",
     accSubmit: "Accetto questa proposta",
     accFooter: "La tua accettazione viene inviata al fornitore tramite WhatsApp.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Salve ${org},\n\nAccetto la proposta "${title}"${num ? ` (rif. ${num})` : ""}${amount ? `, importo ${amount}` : ""}.\nConfermato — ${name}, ${date}.`,
     errAccName: "Inserisci il tuo nome per confermare.",
     ficheCoords: "I tuoi dati di contatto",
     ficheNamePhone: "Telefono *",
@@ -396,6 +415,8 @@ const T: Record<LangCode, {
     accNameLabel: "Ваше имя (подтверждение)",
     accSubmit: "Принимаю это предложение",
     accFooter: "Ваше согласие отправляется поставщику через WhatsApp.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Здравствуйте, ${org},\n\nПринимаю предложение «${title}»${num ? ` (реф. ${num})` : ""}${amount ? `, сумма ${amount}` : ""}.\nПодтверждено — ${name}, ${date}.`,
     errAccName: "Пожалуйста, введите ваше имя для подтверждения.",
     ficheCoords: "Ваши контактные данные",
     ficheNamePhone: "Телефон *",
@@ -433,6 +454,8 @@ const T: Record<LangCode, {
     accNameLabel: "Adınız (onay için)",
     accSubmit: "Bu teklifi kabul ediyorum",
     accFooter: "Kabulünüz WhatsApp ile sağlayıcıya gönderilir.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Merhaba ${org},\n\n"${title}" teklifini${num ? ` (ref. ${num})` : ""} kabul ediyorum${amount ? `, tutar ${amount}` : ""}.\nOnaylandı — ${name}, ${date}.`,
     errAccName: "Onaylamak için adınızı girin.",
     ficheCoords: "İletişim bilgileriniz",
     ficheNamePhone: "Telefon *",
@@ -470,6 +493,8 @@ const T: Record<LangCode, {
     accNameLabel: "आपका नाम (स्वीकृति के लिए)",
     accSubmit: "मैं यह प्रस्ताव स्वीकार करता/करती हूँ",
     accFooter: "आपकी स्वीकृति WhatsApp के माध्यम से प्रदाता को भेजी जाती है।",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `नमस्ते ${org},\n\nमैं प्रस्ताव "${title}"${num ? ` (संदर्भ: ${num})` : ""}${amount ? `, राशि ${amount}` : ""} स्वीकार करता/करती हूँ।\nपुष्टि — ${name}, ${date}.`,
     errAccName: "पुष्टि करने के लिए अपना नाम दर्ज करें।",
     ficheCoords: "आपकी संपर्क जानकारी",
     ficheNamePhone: "फ़ोन *",
@@ -507,6 +532,8 @@ const T: Record<LangCode, {
     accNameLabel: "Uw naam (acceptatie)",
     accSubmit: "Ik accepteer dit voorstel",
     accFooter: "Uw acceptatie wordt via WhatsApp naar de provider verzonden.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Hallo ${org},\n\nIk accepteer het voorstel "${title}"${num ? ` (ref. ${num})` : ""}${amount ? `, bedrag ${amount}` : ""}.\nAkkoord — ${name}, ${date}.`,
     errAccName: "Voer uw naam in ter bevestiging.",
     ficheCoords: "Uw contactgegevens",
     ficheNamePhone: "Telefoon *",
@@ -544,6 +571,8 @@ const T: Record<LangCode, {
     accNameLabel: "Twoje imię (akceptacja)",
     accSubmit: "Akceptuję tę ofertę",
     accFooter: "Twoja akceptacja jest wysyłana do dostawcy przez WhatsApp.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Dzień dobry ${org},\n\nAkceptuję ofertę "${title}"${num ? ` (ref. ${num})` : ""}${amount ? `, kwota ${amount}` : ""}.\nZatwierdzone — ${name}, ${date}.`,
     errAccName: "Proszę wpisać swoje imię w celu potwierdzenia.",
     ficheCoords: "Twoje dane kontaktowe",
     ficheNamePhone: "Telefon *",
@@ -581,6 +610,8 @@ const T: Record<LangCode, {
     accNameLabel: "성명 (수락 확인용)",
     accSubmit: "이 제안을 수락합니다",
     accFooter: "수락 내용이 WhatsApp으로 제공자에게 전송됩니다.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `안녕하세요 ${org},\n\n제안서 "${title}"${num ? ` (참조: ${num})` : ""}${amount ? `, 금액 ${amount}` : ""}을(를) 수락합니다.\n확인 — ${name}, ${date}.`,
     errAccName: "확인을 위해 성명을 입력해 주세요.",
     ficheCoords: "연락처 정보",
     ficheNamePhone: "전화번호 *",
@@ -618,6 +649,8 @@ const T: Record<LangCode, {
     accNameLabel: "Nama Anda (penerimaan)",
     accSubmit: "Saya menerima penawaran ini",
     accFooter: "Penerimaan Anda dikirim ke penyedia melalui WhatsApp.",
+    accMsg: (org: string, title: string, num: string, amount: string, name: string, date: string) =>
+      `Halo ${org},\n\nSaya menerima penawaran "${title}"${num ? ` (ref. ${num})` : ""}${amount ? `, jumlah ${amount}` : ""}.\nDisetujui — ${name}, ${date}.`,
     errAccName: "Masukkan nama Anda untuk mengonfirmasi.",
     ficheCoords: "Informasi kontak Anda",
     ficheNamePhone: "Telepon *",
@@ -790,12 +823,9 @@ function Accept({ params, accent, i18n }: { params: URLSearchParams; accent: str
   function accept() {
     if (!name.trim()) return setErr(i18n.errAccName);
     if (!to) return setErr(i18n.errBadLink);
-    const msg =
-      `Bonjour ${org},\n\n` +
-      `J'accepte la proposition « ${title} »` +
-      (num ? ` (réf. ${num})` : "") +
-      (amount ? `, montant ${formatMoney(amount, cur)}` : "") +
-      `.\nBon pour accord — ${name}, le ${new Date().toLocaleDateString("fr-FR")}.`;
+    const langCode = params.get("lang") ?? "fr";
+    const date = new Date().toLocaleDateString(langCode === "fr" ? "fr-FR" : langCode === "ar" ? "ar" : "en-GB");
+    const msg = i18n.accMsg(org ?? "", title ?? "", num ?? "", amount ? formatMoney(amount, cur) : "", name, date);
     window.location.href = whatsappLink(to, msg);
   }
 
