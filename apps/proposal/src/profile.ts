@@ -17,10 +17,12 @@ export async function saveProfile(p: CompanyProfile): Promise<void> {
   await db.settings.put({ ...p, id: 1 });
 }
 
-/** Migration : remplace l'ancienne URL GitHub Pages par portal.lassi.tech */
+/** Migration : force portal.lassi.tech si whatsappPhone présent mais portalUrl manquante/obsolète */
 export async function migratePortalUrl(): Promise<void> {
   const p = await db.settings.get(1);
-  if (p?.portalUrl?.includes("github.io")) {
+  if (!p) return;
+  const needsUpdate = !p.portalUrl || p.portalUrl.includes("github.io") || !p.portalUrl.includes("portal.lassi.tech");
+  if (needsUpdate && p.whatsappPhone?.trim()) {
     await db.settings.put({ ...p, portalUrl: "https://portal.lassi.tech/" });
   }
 }
