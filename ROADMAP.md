@@ -101,14 +101,12 @@ Réutilise ~80% du socle Invoice (PDF, Money, Storage, Licence, clients, backup)
 7. **Clients** — CRUD + import CSV/vCard + export (réutilise `clients-import` et le socle CSV).
 8. **Packaging** — build fichier unique hors-ligne, docs acheteur (`release-assets/proposal/`), pages produit Chariow + Lemon Squeezy + notes vendeur (`marketing/`), `tools/pack-proposal.ps1` → `release/Proposal-Generator.zip`. Couvert par le test E2E (activation, modèle, PDF réel).
 
-## Licence — avant de vendre (important)
+## Protection accès — modèle lien secret (v1)
 
-- Licence **v1 = double vérification** : Gumroad UUID en premier (API Gumroad v2, automatique à l'achat), puis HMAC offline pour les ventes manuelles (Chariow).
-- Génération clé manuelle : `npm run genkey -- proposal-generator "Nom Acheteur" pro 0`
-- Secret HMAC dans `apps/proposal/.env.local` (VITE_LICENSE_SECRET) — **jamais dans le code source**.
-- ✅ Secret de production changé (2026-09-29).
-- Limite v1 : secret HMAC présent dans le bundle client → un acheteur avancé peut forger une clé HMAC. Acceptable pour lancer. **v2** = validation serveur ou Ed25519 (clé privée hors bundle).
-- L'outil `tools/genkey.mjs` ne doit **jamais** être livré aux acheteurs.
+- **Modèle retenu : lien secret.** L'app est déployée sur https://proposal.lassi.tech/ (Vercel). Accès libre après connexion Firebase (Google ou email). Le lien n'est jamais publié publiquement — envoyé uniquement aux acheteurs après paiement.
+- Gumroad : lien livré automatiquement via le champ "Content" du produit.
+- Chariow : lien envoyé manuellement (WhatsApp/email) après confirmation Wave/OM.
+- **v2 possible** : Firebase custom claims (rôle "paid" vérifié côté serveur) si des abus sont détectés.
 
 ## Journal
 

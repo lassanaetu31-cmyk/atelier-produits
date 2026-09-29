@@ -8,7 +8,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-const SECRET = "e0fa06d182ce9a95aa8d91bed2238bea23b6e680aa0f45e244095c1797e81f8d";
+// Lire depuis la variable d'env : ATELIER_LICENSE_SECRET=... node tools/screenshots.mjs
+const SECRET = process.env.ATELIER_LICENSE_SECRET ?? "";
 const b64url = (buf) =>
   Buffer.from(buf).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 function makeKey(product, buyer = "Studio Démo", plan = "pro", expiresAt = 0) {
@@ -54,16 +55,8 @@ try {
   await page.locator("button", { hasText: "Français" }).click();
   await page.getByRole("button").filter({ hasText: /continuer|continue/i }).click();
 
-  // --- SCREEN 2 : Écran de licence (LicenseGate) ---
-  await page.getByPlaceholder(/clé|key/i).waitFor({ timeout: 8000 });
-  await shot(page, "02-activation-licence.png");
-
-  // Activer la licence
-  await page.getByPlaceholder(/clé|key/i).fill(makeKey("proposal-generator"));
-  await page.getByRole("button", { name: /activer|activate/i }).click();
+  // --- SCREEN 2 : MODÈLE MÉTIER + FORMULES 3 NIVEAUX ---
   await page.getByRole("button", { name: /télécharger|download/i }).waitFor({ timeout: 8000 });
-
-  // --- SCREEN 3 : MODÈLE MÉTIER + FORMULES 3 NIVEAUX ---
   await page.getByRole("combobox").first().selectOption({ label: "Site web / dev" });
   await page.waitForTimeout(300);
 
@@ -85,7 +78,7 @@ try {
   if (nTiers > 1) await formules.locator('input[type="checkbox"]').nth(1).check();
   await page.mouse.wheel(0, -2000);
   await page.waitForTimeout(300);
-  await shot(page, "03-modele-metier-formules.png", { fullPage: true });
+  await shot(page, "02-modele-metier-formules.png", { fullPage: true });
 
   // --- SCREEN 4 : PROPOSITION PDF ---
   const [dl] = await Promise.all([
@@ -98,10 +91,10 @@ try {
   await pdfPage.setViewportSize({ width: 1000, height: 1300 });
   await pdfPage.goto(pathToFileURL(pdfPath).href);
   await pdfPage.waitForTimeout(2500);
-  await shot(pdfPage, "04-proposition-pdf.png");
+  await shot(pdfPage, "03-proposition-pdf.png");
   await pdfPage.close();
 
-  // --- SCREEN 5 : ADHÉRENTS ---
+  // --- SCREEN 4 : ADHÉRENTS ---
   await page.getByRole("button", { name: /adhérents|members/i }).click();
   const members = [
     ["ADH-001", "Awa Diallo"],
@@ -116,9 +109,9 @@ try {
   }
   await page.mouse.wheel(0, -2000);
   await page.waitForTimeout(300);
-  await shot(page, "05-adherents.png", { fullPage: true });
+  await shot(page, "04-adherents.png", { fullPage: true });
 
-  // --- SCREEN 6 : FORMULAIRE + RÉCEPTION ---
+  // --- SCREEN 5 : FORMULAIRE + RÉCEPTION ---
   const sub = {
     createdAt: Date.now(),
     formTitle: "Fiche de renseignement",
@@ -129,14 +122,9 @@ try {
   };
   await page.goto(pathToFileURL(proposalHtml).href + "#reception=" + b64urlJson(sub));
   await page.reload();
-  const keyInput = page.getByPlaceholder(/clé|key/i);
-  if (await keyInput.isVisible().catch(() => false)) {
-    await keyInput.fill(makeKey("proposal-generator"));
-    await page.getByRole("button", { name: /activer|activate/i }).click();
-  }
   await page.getByText("Fatou Sow").first().waitFor({ timeout: 10000 });
   await page.waitForTimeout(300);
-  await shot(page, "06-formulaire-reception.png", { fullPage: true });
+  await shot(page, "05-formulaire-reception.png", { fullPage: true });
 
   await ctx.close();
 
@@ -149,14 +137,14 @@ try {
   const mp = await mob.newPage();
   const base = pathToFileURL(portalHtml).href;
 
-  // --- SCREEN 7 : Inscription (mobile) ---
+  // --- SCREEN 6 : Inscription (mobile) ---
   await mp.goto(`${base}?v=inscription&org=${encodeURIComponent("Club Karaté Dakar")}&to=221771234567`);
   await mp.getByText("Inscription — Club Karaté Dakar").waitFor({ timeout: 8000 });
   await mp.getByLabel("Nom / Prénom *").fill("Awa Diallo");
   await mp.waitForTimeout(300);
-  await shot(mp, "07-portail-inscription-mobile.png");
+  await shot(mp, "06-portail-inscription-mobile.png");
 
-  // --- SCREEN 8 : Acceptation de proposition (mobile) ---
+  // --- SCREEN 7 : Acceptation de proposition (mobile) ---
   await mp.goto(
     `${base}?v=accept&org=Studio%20Démo&to=221770000000&num=PROP-2026-0001&title=${encodeURIComponent(
       "Refonte site web",
@@ -165,7 +153,7 @@ try {
   await mp.getByText("Refonte site web").waitFor({ timeout: 8000 });
   await mp.getByLabel("Votre nom (bon pour accord)").fill("Modou Kane");
   await mp.waitForTimeout(300);
-  await shot(mp, "08-portail-acceptation-mobile.png");
+  await shot(mp, "07-portail-acceptation-mobile.png");
 
   await mob.close();
 } finally {

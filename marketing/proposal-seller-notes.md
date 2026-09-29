@@ -2,34 +2,22 @@
 
 ## Ressources
 - Code (privé) : https://github.com/lassanaetu31-cmyk/atelier-produits
-- App déployée (Vercel) : https://proposal.lassi.tech/
+- App (lien secret — ne pas publier) : https://proposal.lassi.tech/
 - Pages produit : `proposal-chariow.md` (FCFA), `proposal-lemonsqueezy.md` (USD)
 
-## Fabriquer le ZIP à livrer (Chariow / ventes manuelles)
-```
-cd apps/proposal && npm run build
-# -> apps/proposal/dist/index.html
-# Copier dans release/Proposal-Generator/ puis zipper
-```
-Le ZIP contient : `Proposal-Generator.html`, `LISEZ-MOI.txt`, `CONDITIONS.txt`.
+## Modèle de protection : lien secret
+L'app est accessible à quiconque a le lien. Le lien n'est pas indexé et n'est jamais publié publiquement.
+**À livrer uniquement après paiement confirmé.**
 
-## Licences
+## À livrer à l'acheteur
+1. Le lien : https://proposal.lassi.tech/
+2. Instructions : créer un compte (Google ou email), choisir la langue, c'est prêt.
 
-### Gumroad (automatique)
-La clé UUID générée par Gumroad à l'achat fonctionne directement dans l'app.
-L'acheteur colle sa clé UUID dans l'écran de licence — aucune action vendeur.
+## Livraison Gumroad (automatique)
+Coller le lien dans le champ "Content" du produit Gumroad — Gumroad l'envoie automatiquement après paiement.
 
-### Chariow / ventes manuelles (clé HMAC)
-```
-npm run genkey -- proposal-generator "Nom Acheteur" pro 0      # à vie
-npm run genkey -- proposal-generator "Nom Acheteur" pro 365    # 1 an
-```
-Secret dans `apps/proposal/.env.local` (VITE_LICENSE_SECRET). Ne jamais livrer `genkey.mjs`.
-
-## À livrer à l'acheteur (Chariow)
-1. Le ZIP `Proposal-Generator.zip`
-2. Sa clé HMAC générée avec genkey
-3. URL portail : https://proposal.lassi.tech/ (à coller dans Profil > Portail public avec son WhatsApp)
+## Livraison Chariow (manuelle)
+Envoyer le lien par message (WhatsApp / email) dès que le paiement Wave/OM est confirmé.
 
 ## Prix
 | Offre | FCFA | USD |
@@ -39,24 +27,21 @@ Secret dans `apps/proposal/.env.local` (VITE_LICENSE_SECRET). Ne jamais livrer `
 | Agence / Asso | 45 000 | $79 |
 
 ## Flux acheteur (premier lancement)
-1. Ouvre le HTML dans Chrome/Edge (ou https://proposal.lassi.tech/)
+1. Ouvre https://proposal.lassi.tech/
 2. Connexion Google ou email/password (compte gratuit Firebase)
 3. Choix de la langue (16 langues disponibles)
-4. Colle sa clé de licence (UUID Gumroad ou clé HMAC)
-5. Accès à l'app
+4. Accès direct à l'app — aucune clé requise
 
 ## Checklist avant la 1ʳᵉ vente
-- [x] Secret HMAC de production changé (`apps/proposal/.env.local`)
 - [x] App déployée sur Vercel (proposal.lassi.tech)
+- [x] LicenseGate supprimée — accès libre après connexion
 - [x] 8 captures d'écran générées (`marketing/screenshots/`)
-- [x] Vérification Gumroad UUID intégrée dans `verifyLicense`
+- [ ] Lien configuré dans Gumroad (champ Content)
 - [ ] Page produit publiée : Gumroad (USD) et Chariow (FCFA)
 - [ ] Moyen de paiement configuré sur chaque plateforme
-- [ ] Test achat complet sur Gumroad (clé UUID → activation dans l'app)
-- [ ] Test sur vrai Android : Chrome, langue, licence, PDF, portail
+- [ ] Test sur vrai Android : Chrome, langue, app fonctionnelle
 
 ## Rappels
-- Chaque app a son propre `.env.local` avec son propre `VITE_LICENSE_SECRET`.
-- Le secret HMAC n'est PAS dans le code source — uniquement dans `.env.local` (non commité).
+- Ne jamais poster le lien https://proposal.lassi.tech/ publiquement (réseaux sociaux, Product Hunt, etc.) — toujours rediriger vers la page Gumroad/Chariow.
 - Pour les screenshots : `VITE_SKIP_AUTH=true npx vite build` dans `apps/proposal`, puis `node tools/screenshots.mjs`.
 - Permalink Gumroad : `kmmsac` (lassiapp.gumroad.com/l/kmmsac).
