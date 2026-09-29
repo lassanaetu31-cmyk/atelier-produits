@@ -117,11 +117,14 @@ function AppShell({ user }: { user: User }) {
   );
 }
 
+const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === "true";
+
 function AppWithAuth() {
-  const [user, setUser] = useState<User | null | "loading">("loading");
+  const [user, setUser] = useState<User | null | "loading">(SKIP_AUTH ? ({ email: "demo@screenshots.local" } as User) : "loading");
   const [langChosen, setLangChosen] = useState(() => !!localStorage.getItem(LANG_STORAGE_KEY));
 
   useEffect(() => {
+    if (SKIP_AUTH) return;
     return onAuthStateChanged(auth, (u) => setUser(u));
   }, []);
 
@@ -137,7 +140,7 @@ function AppWithAuth() {
   if (!langChosen) return <LangPickerView onDone={() => setLangChosen(true)} />;
 
   return (
-    <LicenseGate>
+    <LicenseGate buyer={user.displayName ?? user.email ?? ""}>
       <AppShell user={user} />
     </LicenseGate>
   );

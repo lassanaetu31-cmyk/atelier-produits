@@ -3,20 +3,23 @@
 // Reproduit exactement la signature HMAC de packages/core/src/license.ts (licence v1 offline).
 //
 // Usage :
-//   node tools/genkey.mjs <product> <buyer> <plan> <days>
-// Exemples :
-//   node tools/genkey.mjs invoice-generator "Boutique Awa" pro 0      -> licence à vie
-//   node tools/genkey.mjs invoice-generator "Client Test" lite 365    -> expire dans 365 jours
+//   node tools/genkey.mjs "Nom Acheteur"
+// Exemple :
+//   node tools/genkey.mjs "Boutique Awa"   -> clé à vie pour proposal-generator
 //
-// Secret : défini via ATELIER_LICENSE_SECRET, sinon valeur par défaut (à changer avant de vendre).
+// Secret : ATELIER_LICENSE_SECRET (doit correspondre à VITE_LICENSE_SECRET dans .env.local).
 
 import crypto from "node:crypto";
 
-// DOIT rester identique à LICENSE_SECRET dans packages/core/src/license.ts.
-const SECRET = process.env.ATELIER_LICENSE_SECRET || "p9ykXGFa39nyyjrnAaoA4PJFNL9hAiBNA9jQ97vk0eU";
+const SECRET = process.env.ATELIER_LICENSE_SECRET;
+if (!SECRET) {
+  console.error("\n⛔  Définir ATELIER_LICENSE_SECRET avant de générer des clés.");
+  console.error("    Exemple : $env:ATELIER_LICENSE_SECRET='votre-secret' ; node tools/genkey.mjs \"Nom\"\n");
+  process.exit(1);
+}
 
-const [, , product = "invoice-generator", buyer = "Client", plan = "pro", days = "0"] =
-  process.argv;
+const [, , buyer = "Client", plan = "pro", days = "0"] = process.argv;
+const product = "proposal-generator";
 
 const nbDays = Number(days) || 0;
 const expiresAt = nbDays > 0 ? Date.now() + nbDays * 86400000 : 0;

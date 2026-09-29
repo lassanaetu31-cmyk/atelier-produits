@@ -16,9 +16,11 @@ export interface LicenseCheck {
   payload?: LicensePayload;
 }
 
-// Secret de licence v1 (HMAC). DOIT être identique à tools/genkey.mjs.
-// Limite v1 : présent dans le bundle client. v2 = signature asymétrique / serveur.
-const LICENSE_SECRET = "p9ykXGFa39nyyjrnAaoA4PJFNL9hAiBNA9jQ97vk0eU";
+// Secret injecté à la compilation via VITE_LICENSE_SECRET (jamais dans le dépôt).
+const LICENSE_SECRET: string =
+  (typeof import.meta !== "undefined" && (import.meta as unknown as { env: Record<string, string> }).env
+    ? (import.meta as unknown as { env: Record<string, string> }).env.VITE_LICENSE_SECRET ?? ""
+    : "") || "change-me-set-VITE_LICENSE_SECRET";
 
 async function hmac(data: string, secret = LICENSE_SECRET): Promise<string> {
   const enc = new TextEncoder();
