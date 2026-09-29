@@ -3,7 +3,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { exportCsv } from "@atelier/core";
 import { db } from "../db";
 import { useProfile } from "../profile";
-import { DEFAULT_FORM, ficheLink, saveFormConfig, useFormConfig } from "../form-config";
+import { getDefaultForm, ficheLink, saveFormConfig, useFormConfig } from "../form-config";
 import { portalReady } from "../portal-links";
 import { importPasted } from "../reception";
 import { useLang } from "../i18n/context";
@@ -15,7 +15,10 @@ export default function FormsView() {
   const { t } = useLang();
   const profile = useProfile();
   const stored = useFormConfig();
-  const [cfg, setCfg] = useState<FormConfig>(stored);
+  const [cfg, setCfg] = useState<FormConfig>(getDefaultForm(t));
+  // Sync avec la DB une fois chargée
+  const [synced, setSynced] = useState(false);
+  if (stored && !synced) { setCfg(stored); setSynced(true); }
   const [flash, setFlash] = useState("");
   const [copied, setCopied] = useState(false);
   const [paste, setPaste] = useState("");
@@ -27,7 +30,7 @@ export default function FormsView() {
     [],
   );
 
-  const shareLink = ficheLink(profile, stored);
+  const shareLink = stored ? ficheLink(profile, stored) : null;
 
   function patch(p: Partial<FormConfig>) {
     setCfg((c) => ({ ...c, ...p }));
@@ -164,7 +167,7 @@ export default function FormsView() {
       <section className="grid gap-3 rounded-xl border bg-white p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">{t("forms.configTitle")}</h2>
-          <button className="text-xs text-slate-400 hover:underline" onClick={() => setCfg({ ...DEFAULT_FORM })}>
+          <button className="text-xs text-slate-400 hover:underline" onClick={() => setCfg({ ...getDefaultForm(t) })}>
             {t("forms.reset")}
           </button>
         </div>

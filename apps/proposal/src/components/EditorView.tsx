@@ -149,12 +149,16 @@ export default function EditorView({
       setTimeout(() => setFlash(""), 3000);
       return;
     }
+    // window.open AVANT le await — les navigateurs mobiles bloquent sinon
+    const win = window.open("", "_blank");
     const saved = await persist();
     if (saved.status === "Brouillon") {
       await db.proposals.update(saved.id!, { status: "Envoyée" });
       setDraft({ ...saved, status: "Envoyée" });
     }
-    window.open(proposalWhatsappLink(saved, selectedClient.phone, acceptLink(profile, saved, lang), lang), "_blank");
+    const url = proposalWhatsappLink(saved, selectedClient.phone, acceptLink(profile, saved, lang), lang);
+    if (win) win.location.href = url;
+    else window.location.href = url;
   }
 
   return (

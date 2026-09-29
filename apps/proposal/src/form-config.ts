@@ -4,6 +4,19 @@ import { b64urlEncode } from "./codec";
 import { portalReady } from "./portal-links";
 import type { CompanyProfile, FormConfig } from "./types";
 
+export function getDefaultForm(t: (k: string) => string): FormConfig {
+  return {
+    id: 1,
+    title: t("forms.defaultTitle"),
+    subtitle: "",
+    interests: t("forms.defaultInterests").split("\n"),
+    recontact: t("forms.defaultRecontact").split("\n"),
+    askStructure: true,
+    consentText: t("forms.defaultConsent"),
+  };
+}
+
+/** Compatibilité — utiliser getDefaultForm(t) quand t() est disponible. */
 export const DEFAULT_FORM: FormConfig = {
   id: 1,
   title: "Fiche de renseignement & de contact",
@@ -24,9 +37,9 @@ export const DEFAULT_FORM: FormConfig = {
     "J'accepte que mes coordonnées soient utilisées uniquement afin d'être recontacté(e) dans le cadre des informations et propositions présentées.",
 };
 
-/** Config du formulaire (live). Défaut tant qu'aucune config n'est enregistrée. */
-export function useFormConfig(): FormConfig {
-  return useLiveQuery(() => db.forms.get(1), [], undefined) ?? DEFAULT_FORM;
+/** Config du formulaire (live). Retourne undefined si rien n'est enregistré. */
+export function useFormConfig(): FormConfig | undefined {
+  return useLiveQuery(() => db.forms.get(1), [], undefined);
 }
 
 export async function saveFormConfig(cfg: FormConfig): Promise<void> {
