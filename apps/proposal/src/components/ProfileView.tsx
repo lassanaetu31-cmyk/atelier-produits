@@ -143,7 +143,7 @@ export default function ProfileView() {
             const phone = e.target.value;
             patch({
               whatsappPhone: phone,
-              portalUrl: phone.trim() ? "https://lassanaetu31-cmyk.github.io/atelier-produits/portal/" : "",
+              portalUrl: phone.trim() ? "https://portal.lassi.tech/" : "",
             });
           }}
         />
