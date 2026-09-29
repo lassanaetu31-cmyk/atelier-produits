@@ -16,11 +16,7 @@ export interface LicenseCheck {
   payload?: LicensePayload;
 }
 
-// Secret injecté à la compilation via VITE_LICENSE_SECRET (jamais dans le dépôt).
-const LICENSE_SECRET: string =
-  (typeof import.meta !== "undefined" && (import.meta as unknown as { env: Record<string, string> }).env
-    ? (import.meta as unknown as { env: Record<string, string> }).env.VITE_LICENSE_SECRET ?? ""
-    : "") || "change-me-set-VITE_LICENSE_SECRET";
+const LICENSE_SECRET = "change-me-set-VITE_LICENSE_SECRET";
 
 async function hmac(data: string, secret = LICENSE_SECRET): Promise<string> {
   const enc = new TextEncoder();
@@ -97,6 +93,7 @@ export async function verifyLicense(
   if (parts.length !== 2) return { valid: false, reason: "Format de clé invalide" };
   const [body, sig] = parts;
   const expected = await hmac(body, secret);
+  console.debug("[license] secret_used:", secret ?? LICENSE_SECRET, "sig:", sig, "expected:", expected);
   if (sig !== expected) return { valid: false, reason: "Signature invalide" };
   let payload: LicensePayload;
   try {
