@@ -16,3 +16,11 @@ export function useProfile(): CompanyProfile {
 export async function saveProfile(p: CompanyProfile): Promise<void> {
   await db.settings.put({ ...p, id: 1 });
 }
+
+/** Migration : remplace l'ancienne URL GitHub Pages par portal.lassi.tech */
+export async function migratePortalUrl(): Promise<void> {
+  const p = await db.settings.get(1);
+  if (p?.portalUrl?.includes("github.io")) {
+    await db.settings.put({ ...p, portalUrl: "https://portal.lassi.tech/" });
+  }
+}

@@ -11,6 +11,7 @@ import MembersView from "./components/MembersView";
 import FormsView from "./components/FormsView";
 import ProfileView from "./components/ProfileView";
 import { importFromHash } from "./reception";
+import { migratePortalUrl } from "./profile";
 import type { SavedProposal } from "./types";
 
 type Tab = "editor" | "clients" | "members" | "forms" | "history" | "profile";
@@ -116,13 +117,15 @@ function AppShell({ user }: { user: User }) {
   );
 }
 
-const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === "true";
+const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === "true" || location.protocol === "file:";
+const OFFLINE_USER = { email: "local" } as User;
 
 function AppWithAuth() {
-  const [user, setUser] = useState<User | null | "loading">(SKIP_AUTH ? ({ email: "demo@screenshots.local" } as User) : "loading");
+  const [user, setUser] = useState<User | null | "loading">(SKIP_AUTH ? OFFLINE_USER : "loading");
   const [langChosen, setLangChosen] = useState(() => !!localStorage.getItem(LANG_STORAGE_KEY));
 
   useEffect(() => {
+    migratePortalUrl();
     if (SKIP_AUTH) return;
     return onAuthStateChanged(auth, (u) => setUser(u));
   }, []);
