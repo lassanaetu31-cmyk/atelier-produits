@@ -47,6 +47,7 @@ export default function EditorView({
   const profile = useProfile();
   const [draft, setDraft] = useState<SavedProposal>(initial ?? blankDraft(lang));
   const [flash, setFlash] = useState("");
+  const [manualPhone, setManualPhone] = useState("");
 
   const TEMPLATES = useMemo(() => getTemplates(lang), [lang]);
   const EXTRA_SECTIONS = useMemo(() => getExtraSections(lang), [lang]);
@@ -114,9 +115,9 @@ export default function EditorView({
   }
 
   function pickClient(value: string) {
-    if (value === "") return patch({ clientId: undefined });
+    if (value === "") { patch({ clientId: undefined }); setManualPhone(""); return; }
     const c = clients.find((x) => x.id === Number(value));
-    if (c) patch({ clientId: c.id, clientName: c.name });
+    if (c) { patch({ clientId: c.id, clientName: c.name }); setManualPhone(c.phone ?? ""); }
   }
 
   async function persist(): Promise<SavedProposal> {
@@ -144,7 +145,8 @@ export default function EditorView({
   }
 
   async function sendWhatsApp() {
-    if (!selectedClient?.phone) {
+    const phone = selectedClient?.phone || manualPhone.trim();
+    if (!phone) {
       setFlash(t("editor.noPhone"));
       setTimeout(() => setFlash(""), 3000);
       return;
@@ -156,7 +158,7 @@ export default function EditorView({
       await db.proposals.update(saved.id!, { status: "Envoyée" });
       setDraft({ ...saved, status: "Envoyée" });
     }
-    const url = proposalWhatsappLink(saved, selectedClient.phone, acceptLink(profile, saved, lang), lang);
+    const url = proposalWhatsappLink(saved, phone, acceptLink(profile, saved, lang), lang);
     if (win) win.location.href = url;
     else window.location.href = url;
   }
@@ -247,6 +249,17 @@ export default function EditorView({
               className="mt-1 w-full rounded border px-3 py-2"
               value={draft.clientName}
               onChange={(e) => patch({ clientName: e.target.value })}
+            />
+          </label>
+        )}
+        {!selectedClient?.phone && (
+          <label className="text-sm">
+            {t("editor.whatsappPhone")}
+            <input
+              className="mt-1 w-full rounded border px-3 py-2"
+              placeholder="+221 77 000 00 00"
+              value={manualPhone}
+              onChange={(e) => setManualPhone(e.target.value)}
             />
           </label>
         )}
@@ -491,10 +504,8 @@ export default function EditorView({
           {t("editor.save")}
         </button>
         <button
-          className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700 disabled:opacity-40"
+          className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
           onClick={sendWhatsApp}
-          disabled={!selectedClient?.phone}
-          title={selectedClient?.phone ? "" : t("editor.noPhone")}
         >
           {t("editor.sendWhatsApp")}
         </button>
