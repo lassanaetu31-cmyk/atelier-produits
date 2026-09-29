@@ -12,6 +12,7 @@ import { useLang } from "../i18n/context";
 type Status = "checking" | "locked" | "unlocked";
 
 const WA_NUMBER = "221761890003";
+const LICENSE_SECRET = import.meta.env.VITE_LICENSE_SECRET as string | undefined;
 
 export default function LicenseGate({ children, buyer }: { children: ReactNode; buyer: string }) {
   const { t } = useLang();
@@ -24,7 +25,7 @@ export default function LicenseGate({ children, buyer }: { children: ReactNode; 
     (async () => {
       const stored = loadLicense();
       if (!stored) return setStatus("locked");
-      const res = await verifyLicense(stored, GUMROAD_PERMALINK);
+      const res = await verifyLicense(stored, GUMROAD_PERMALINK, LICENSE_SECRET);
       if (res.valid && (res.payload?.product === PRODUCT_ID || res.payload?.product === GUMROAD_PERMALINK)) {
         setLicense(res.payload);
         setStatus("unlocked");
@@ -37,7 +38,7 @@ export default function LicenseGate({ children, buyer }: { children: ReactNode; 
   async function activate() {
     setError("");
     const key = keyInput.trim();
-    const res = await verifyLicense(key, GUMROAD_PERMALINK);
+    const res = await verifyLicense(key, GUMROAD_PERMALINK, LICENSE_SECRET);
     if (!res.valid) return setError(res.reason ?? t("license.invalidKey"));
     if (res.payload?.product !== PRODUCT_ID && res.payload?.product !== GUMROAD_PERMALINK) {
       return setError(t("license.wrongProduct"));
