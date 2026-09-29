@@ -141,10 +141,13 @@ export default function ProfileView() {
           value={form.whatsappPhone ?? ""}
           onChange={(e) => {
             const phone = e.target.value;
-            patch({
+            const updated = {
+              ...form,
               whatsappPhone: phone,
               portalUrl: phone.trim() ? "https://portal.lassi.tech/" : "",
-            });
+            };
+            patch({ whatsappPhone: phone, portalUrl: updated.portalUrl });
+            saveProfile({ ...updated, id: 1 });
           }}
         />
         {form.portalUrl && (
