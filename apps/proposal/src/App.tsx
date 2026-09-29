@@ -10,7 +10,6 @@ import HistoryView from "./components/HistoryView";
 import MembersView from "./components/MembersView";
 import FormsView from "./components/FormsView";
 import ProfileView from "./components/ProfileView";
-import LicenseGate from "./components/LicenseGate";
 import { importFromHash } from "./reception";
 import type { SavedProposal } from "./types";
 
@@ -139,11 +138,7 @@ function AppWithAuth() {
   if (!user) return <AuthView />;
   if (!langChosen) return <LangPickerView onDone={() => setLangChosen(true)} />;
 
-  return (
-    <LicenseGate buyer={user.displayName ?? user.email ?? ""}>
-      <AppShell user={user} />
-    </LicenseGate>
-  );
+  return <AppShell user={user} />;
 }
 
 export default function App() {

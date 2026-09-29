@@ -2,48 +2,61 @@
 
 ## Ressources
 - Code (privé) : https://github.com/lassanaetu31-cmyk/atelier-produits
-- Portail public (formulaires/inscriptions clients) : https://lassanaetu31-cmyk.github.io/atelier-portail/
+- App déployée (Vercel) : https://proposal.lassi.tech/
 - Pages produit : `proposal-chariow.md` (FCFA), `proposal-lemonsqueezy.md` (USD)
 
-## Fabriquer le produit à livrer
+## Fabriquer le ZIP à livrer (Chariow / ventes manuelles)
 ```
-npm run build:proposal           # apps/proposal/dist/index.html
-powershell -File tools/pack-proposal.ps1   # -> release/Proposal-Generator.zip
+cd apps/proposal && npm run build
+# -> apps/proposal/dist/index.html
+# Copier dans release/Proposal-Generator/ puis zipper
 ```
 Le ZIP contient : `Proposal-Generator.html`, `LISEZ-MOI.txt`, `CONDITIONS.txt`.
 
-## Générer une clé de licence (à chaque vente)
+## Licences
+
+### Gumroad (automatique)
+La clé UUID générée par Gumroad à l'achat fonctionne directement dans l'app.
+L'acheteur colle sa clé UUID dans l'écran de licence — aucune action vendeur.
+
+### Chariow / ventes manuelles (clé HMAC)
 ```
 npm run genkey -- proposal-generator "Nom Acheteur" pro 0      # à vie
 npm run genkey -- proposal-generator "Nom Acheteur" pro 365    # 1 an
 ```
-Produit = **proposal-generator**. Ne JAMAIS livrer `tools/genkey.mjs` aux acheteurs.
+Secret dans `apps/proposal/.env.local` (VITE_LICENSE_SECRET). Ne jamais livrer `genkey.mjs`.
 
-## À livrer à l'acheteur
-1. Le ZIP `Proposal-Generator.zip`.
-2. Sa clé de licence.
-3. Le lien du portail (ci-dessus) — à coller dans Profil > Portail public,
-   avec son numéro WhatsApp, pour activer inscriptions / formulaires / acceptation.
+## À livrer à l'acheteur (Chariow)
+1. Le ZIP `Proposal-Generator.zip`
+2. Sa clé HMAC générée avec genkey
+3. URL portail : https://proposal.lassi.tech/ (à coller dans Profil > Portail public avec son WhatsApp)
 
 ## Prix
 | Offre | FCFA | USD |
 |-------|------|-----|
-| Solo (lancement) | 15 000 | $29 |
+| Solo (lancement) | 17 500 | $29 |
 | Pro | 25 000 | $49 |
 | Agence / Asso | 45 000 | $79 |
-> Lancer à 15 000 / $29 (early bird), remonter vers 20–25k / $39 après quelques ventes + avis.
+
+## Flux acheteur (premier lancement)
+1. Ouvre le HTML dans Chrome/Edge (ou https://proposal.lassi.tech/)
+2. Connexion Google ou email/password (compte gratuit Firebase)
+3. Choix de la langue (16 langues disponibles)
+4. Colle sa clé de licence (UUID Gumroad ou clé HMAC)
+5. Accès à l'app
 
 ## Checklist avant la 1ʳᵉ vente
-- [x] Secret de licence de production changé (fait).
-- [x] Portail hébergé (GitHub Pages, live).
-- [ ] 5–6 captures d'écran (modèles, PDF, Adhérents, Formulaire, portail mobile).
-- [ ] Page produit publiée : Lemon Squeezy (USD) et/ou Chariow/Selar (FCFA).
-- [ ] Moyen de paiement configuré (Mobile Money via Chariow ; carte via Lemon Squeezy).
-- [ ] Test sur un vrai Android : ouvrir le HTML, activer une clé, générer un PDF, tester un lien portail.
-- [ ] Process de livraison prêt (générer la clé + envoyer ZIP + clé + lien portail).
+- [x] Secret HMAC de production changé (`apps/proposal/.env.local`)
+- [x] App déployée sur Vercel (proposal.lassi.tech)
+- [x] 8 captures d'écran générées (`marketing/screenshots/`)
+- [x] Vérification Gumroad UUID intégrée dans `verifyLicense`
+- [ ] Page produit publiée : Gumroad (USD) et Chariow (FCFA)
+- [ ] Moyen de paiement configuré sur chaque plateforme
+- [ ] Test achat complet sur Gumroad (clé UUID → activation dans l'app)
+- [ ] Test sur vrai Android : Chrome, langue, licence, PDF, portail
 
 ## Rappels
-- Secret de licence partagé avec Invoice/Catalog (même `LICENSE_SECRET`). Une clé
-  `proposal-generator` n'ouvre QUE cette app (vérif de l'id produit).
-- Repo privé obligatoire (le secret est dans le code).
-- Mettre à jour le portail après un changement de code : voir `portal-hosting.md`.
+- Chaque app a son propre `.env.local` avec son propre `VITE_LICENSE_SECRET`.
+- Le secret HMAC n'est PAS dans le code source — uniquement dans `.env.local` (non commité).
+- Pour les screenshots : `VITE_SKIP_AUTH=true npx vite build` dans `apps/proposal`, puis `node tools/screenshots.mjs`.
+- Permalink Gumroad : `kmmsac` (lassiapp.gumroad.com/l/kmmsac).

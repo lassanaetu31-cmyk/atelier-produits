@@ -1,4 +1,4 @@
-// Formatage monétaire + calculs commerciaux réutilisés par toutes les apps.
+﻿// Formatage monétaire + calculs commerciaux réutilisés par toutes les apps.
 
 export type Currency = "XOF" | "USD" | "EUR";
 
@@ -14,6 +14,7 @@ export function formatMoney(amount: number, currency: Currency = "XOF"): string 
   const value = new Intl.NumberFormat(LOCALES[currency], {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
+    useGrouping: false,
   }).format(amount);
   return currency === "XOF" ? `${value} FCFA` : `${value} ${currency}`;
 }

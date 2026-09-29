@@ -103,9 +103,11 @@ Réutilise ~80% du socle Invoice (PDF, Money, Storage, Licence, clients, backup)
 
 ## Licence — avant de vendre (important)
 
-- Licence **v1 = HMAC offline** (clé signée, vérifiée sans serveur). Génération vendeur : `npm run genkey -- invoice-generator "Nom Acheteur" pro 0`.
-- ⚠️ **Changer le secret** avant la 1ʳᵉ vente : définir `ATELIER_LICENSE_SECRET` (tool) ET la même valeur dans `packages/core/src/license.ts`. Sinon des clés génériques circulent.
-- Limite v1 : le secret est présent dans le bundle client → un acheteur avancé peut forger une clé. Acceptable pour lancer (livraison manuelle de clé sur Chariow/Lemon Squeezy). **v2** = signature asymétrique (Ed25519, clé privée hors bundle) ou validation serveur.
+- Licence **v1 = double vérification** : Gumroad UUID en premier (API Gumroad v2, automatique à l'achat), puis HMAC offline pour les ventes manuelles (Chariow).
+- Génération clé manuelle : `npm run genkey -- proposal-generator "Nom Acheteur" pro 0`
+- Secret HMAC dans `apps/proposal/.env.local` (VITE_LICENSE_SECRET) — **jamais dans le code source**.
+- ✅ Secret de production changé (2026-09-29).
+- Limite v1 : secret HMAC présent dans le bundle client → un acheteur avancé peut forger une clé HMAC. Acceptable pour lancer. **v2** = validation serveur ou Ed25519 (clé privée hors bundle).
 - L'outil `tools/genkey.mjs` ne doit **jamais** être livré aux acheteurs.
 
 ## Journal
@@ -135,3 +137,8 @@ Réutilise ~80% du socle Invoice (PDF, Money, Storage, Licence, clients, backup)
 - 2026-09-21 — Proposal câblé au portail : profil `whatsappPhone` + `portalUrl` (onglet Profil), générateur `portal-links.ts` (`inscriptionLink`/`acceptLink`), bloc « Lien d'inscription public » (copier/tester) dans Adhérents, lien « Accepter en 1 clic » ajouté au message WhatsApp d'envoi de proposition (éditeur + historique). Note d'hébergement `marketing/portal-hosting.md`. E2E : 4ᵉ contexte (portail) — rendu paramétré + inscription et acceptation → wa.me préremplis (route interceptée). **Tous les tests passent.** Pivot possible plus tard vers backend léger (auto-sync) = offre SaaS.
 - 2026-09-21 — Proposal, éditeur : bibliothèque `SECTION_VARIANTS` (5 variantes de texte par section standard — Contexte, Solution, Livrables, Planning, CGV) proposée via un menu « Textes proposés » sur chaque section. Complète `EXTRA_SECTIONS` (sections entières piochables).
 - 2026-09-21 — Proposal, **Formulaire en ligne + réception dashboard (zéro backend).** Nouvel onglet « Formulaire » (après Adhérents) : éditeur de config (titre, intérêts, recontact, structure, consentement), lien public partageable, liste « Réception ». Portail : nouvelle vue `?v=fiche` (formulaire multi-sections type fiche de renseignement, config passée en base64url dans l'URL). À l'envoi : message WhatsApp vers le gérant + **lien de réception** `#reception=<payload>`. L'app opérateur importe la réponse à l'ouverture du lien (`reception.ts` `importFromHash`) ou via collage (`importPasted`) → table Dexie `submissions` (db v3, backup v3). Export CSV des réponses. Codec base64url Unicode partagé (`codec.ts`). E2E étendu : import #reception dans le dashboard + fiche → wa.me + lien réception. **Tous les tests passent.**
+- 2026-09-21 à 2026-09-28 — **i18n 16 langues** : portail client (`apps/portal`), PDF généré, MembersView, ClientsView, EditorView — traduits en FR/EN/ES/AR/PT/DE/ZH/HI/SW/HA/TR/RU/JA/KO/VI/ID. Corrections templates JA/KO/DE/RU. LangPickerView ajouté : sélection langue au premier lancement (persistée localStorage).
+- 2026-09-28 — **Firebase Auth** : connexion obligatoire (Google ou email/password) avant accès à l'app. Flux : AuthView → LangPickerView → LicenseGate → AppShell. Déploiement Vercel : https://proposal.lassi.tech/
+- 2026-09-29 — **LicenseGate Gumroad** : `verifyLicense` vérifie d'abord les clés UUID Gumroad (API v2), puis HMAC offline — les acheteurs Gumroad n'ont pas besoin de clé séparée. `verifyGumroadLicense` ajouté dans `packages/core/src/license.ts`. Permalink produit : `kmmsac`.
+- 2026-09-29 — Fix `formatMoney` : `useGrouping: false` pour éviter les espaces insécables (` `) dans les montants XOF qui cassaient l'affichage PDF jsPDF. Montants affichés sans séparateur de milliers (`700000 FCFA` au lieu de `700 000 FCFA`).
+- 2026-09-29 — Secret HMAC de production changé (nouveau secret 256 bits dans `apps/proposal/.env.local`). Build screenshots (`VITE_SKIP_AUTH=true`) + 8 captures générées (`marketing/screenshots/`).
