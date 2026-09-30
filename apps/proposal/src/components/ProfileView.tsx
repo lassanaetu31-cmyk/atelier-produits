@@ -132,42 +132,6 @@ export default function ProfileView() {
         </select>
       </div>
 
-      <div className="grid gap-3 border-t pt-4">
-        <h3 className="text-sm font-semibold">{t("profile.portal.title")}</h3>
-        <p className="-mt-1 text-xs text-slate-400">{t("profile.portal.desc")}</p>
-        <input
-          className="rounded border px-3 py-2 text-sm"
-          placeholder={t("profile.whatsapp")}
-          value={form.whatsappPhone ?? ""}
-          onChange={(e) => {
-            const phone = e.target.value;
-            const updated = {
-              ...form,
-              whatsappPhone: phone,
-              portalUrl: phone.trim() ? "https://portal.lassi.tech/" : "",
-            };
-            patch({ whatsappPhone: phone, portalUrl: updated.portalUrl });
-            saveProfile({ ...updated, id: 1 });
-          }}
-        />
-        {form.portalUrl && (
-          <div className="flex items-center gap-2 rounded border bg-slate-50 px-3 py-2 text-sm">
-            <span className="min-w-0 flex-1 truncate text-slate-600">{form.portalUrl}</span>
-            <button
-              type="button"
-              className="shrink-0 text-xs text-blue-600 hover:underline"
-              onClick={() => {
-                navigator.clipboard.writeText(form.portalUrl!);
-                setFlash(t("profile.urlCopied"));
-                setTimeout(() => setFlash(""), 2000);
-              }}
-            >
-              {t("profile.copy")}
-            </button>
-          </div>
-        )}
-        <p className="-mt-1 text-xs text-slate-400">{t("profile.portal.hint")}</p>
-      </div>
 
       {err && <p className="text-sm font-medium text-red-500">{err}</p>}
       <div className="flex items-center gap-3">

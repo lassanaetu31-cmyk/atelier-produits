@@ -60,10 +60,11 @@ function compactCfg(cfg: FormConfig): Record<string, unknown> {
 /** Lien public du formulaire en ligne (à partager). Embarque la config + le retour dashboard. */
 export function ficheLink(profile: CompanyProfile, cfg: FormConfig): string | null {
   if (!portalReady(profile)) return null;
-  const url = new URL(profile.portalUrl!.trim());
+  const phone = profile.phone?.trim() || profile.whatsappPhone?.trim() || "";
+  const url = new URL("https://portal.lassi.tech/");
   url.searchParams.set("v", "fiche");
   url.searchParams.set("org", profile.name);
-  url.searchParams.set("to", profile.whatsappPhone!.trim());
+  url.searchParams.set("to", phone);
   if (profile.accentColor) url.searchParams.set("accent", profile.accentColor.replace("#", ""));
   url.searchParams.set("cfg", b64urlEncode(compactCfg(cfg)));
   if (typeof location !== "undefined" && /^https?:$/.test(location.protocol)) {
