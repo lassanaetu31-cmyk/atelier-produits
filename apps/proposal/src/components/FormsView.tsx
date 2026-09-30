@@ -30,7 +30,7 @@ export default function FormsView() {
     [],
   );
 
-  const shareLink = ficheLink(profile, stored ?? getDefaultForm(t));
+  const shareLink = ficheLink(profile, stored ?? getDefaultForm(t), !stored);
 
   function patch(p: Partial<FormConfig>) {
     setCfg((c) => ({ ...c, ...p }));

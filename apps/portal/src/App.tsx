@@ -870,10 +870,20 @@ function Accept({ params, accent, i18n }: { params: URLSearchParams; accent: str
 
 const DEFAULT_CFG: FormConfig = {
   title: "Fiche de renseignement & de contact",
-  interests: [],
-  recontact: [],
+  interests: [
+    "Découvrir vos services / produits",
+    "Demande de devis / projet",
+    "Partenariat / collaboration",
+    "Recevoir des informations",
+  ],
+  recontact: [
+    "Je souhaite recevoir des informations sur vos offres.",
+    "Je souhaite être recontacté(e) pour un projet.",
+    "Je souhaite être informé(e) de vos événements.",
+  ],
   askStructure: true,
-  consentText: "J'accepte que mes coordonnées soient utilisées afin d'être recontacté(e).",
+  consentText:
+    "J'accepte que mes coordonnées soient utilisées uniquement afin d'être recontacté(e) dans le cadre des informations et propositions présentées.",
 };
 
 function decodeCfg(raw: string | null): FormConfig {
