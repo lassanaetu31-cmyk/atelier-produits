@@ -716,7 +716,7 @@ export default function App() {
         ) : v === "accept" ? (
           <Accept params={p} accent={accent} i18n={i18n} />
         ) : v === "fiche" ? (
-          <Fiche params={p} accent={accent} i18n={i18n} />
+          <Fiche params={p} accent={accent} />
         ) : (
           <Landing i18n={i18n} accent={accent} />
         )}
@@ -906,11 +906,20 @@ function decodeCfg(raw: string | null): FormConfig {
   }
 }
 
-function Fiche({ params, accent, i18n }: { params: URLSearchParams; accent: string; i18n: I18n }) {
+const LANG_NAMES: Record<LangCode, string> = {
+  fr: "Français", en: "English", es: "Español", ar: "العربية", pt: "Português",
+  de: "Deutsch", zh: "中文", ja: "日本語", it: "Italiano", ru: "Русский",
+  tr: "Türkçe", hi: "हिन्दी", nl: "Nederlands", pl: "Polski", ko: "한국어", id: "Bahasa Indonesia",
+};
+
+function Fiche({ params, accent }: { params: URLSearchParams; accent: string }) {
   const org = params.get("org") || "";
   const to = params.get("to") || "";
   const app = params.get("app") || "";
   const cfg = useMemo<FormConfig>(() => decodeCfg(params.get("cfg")), [params]);
+  const [langCode, setLangCode] = useState<LangCode>((params.get("lang") ?? "fr") as LangCode);
+  const i18n = T[langCode] ?? T.fr;
+  const isRTL = langCode === "ar";
 
   const [f, setF] = useState({
     name: "",
@@ -976,7 +985,18 @@ function Fiche({ params, accent, i18n }: { params: URLSearchParams; accent: stri
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-4" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="flex justify-end">
+        <select
+          className="rounded-lg border bg-white px-2 py-1 text-xs text-slate-600"
+          value={langCode}
+          onChange={(e) => setLangCode(e.target.value as LangCode)}
+        >
+          {(Object.keys(LANG_NAMES) as LangCode[]).map((code) => (
+            <option key={code} value={code}>{LANG_NAMES[code]}</option>
+          ))}
+        </select>
+      </div>
       <div className="text-center">
         <h1 className="text-xl font-bold" style={{ color: accent }}>
           {cfg.title}

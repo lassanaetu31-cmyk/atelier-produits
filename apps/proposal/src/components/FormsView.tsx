@@ -12,7 +12,7 @@ import type { FormConfig, Submission } from "../types";
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 
 export default function FormsView() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const profile = useProfile();
   const stored = useFormConfig();
   const [cfg, setCfg] = useState<FormConfig>(getDefaultForm(t));
@@ -30,7 +30,7 @@ export default function FormsView() {
     [],
   );
 
-  const shareLink = ficheLink(profile, stored ?? getDefaultForm(t), !stored);
+  const shareLink = ficheLink(profile, stored ?? getDefaultForm(t), !stored, lang);
 
   function patch(p: Partial<FormConfig>) {
     setCfg((c) => ({ ...c, ...p }));

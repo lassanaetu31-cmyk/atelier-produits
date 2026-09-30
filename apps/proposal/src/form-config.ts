@@ -3,6 +3,7 @@ import { db } from "./db";
 import { b64urlEncode } from "./codec";
 import { portalReady } from "./portal-links";
 import type { CompanyProfile, FormConfig } from "./types";
+import type { LangCode } from "./i18n/translations";
 
 export function getDefaultForm(t: (k: string) => string): FormConfig {
   return {
@@ -58,7 +59,7 @@ function compactCfg(cfg: FormConfig): Record<string, unknown> {
 }
 
 /** Lien public du formulaire en ligne (à partager). Embarque la config + le retour dashboard. */
-export function ficheLink(profile: CompanyProfile, cfg: FormConfig, isDefault = false): string | null {
+export function ficheLink(profile: CompanyProfile, cfg: FormConfig, isDefault = false, lang?: LangCode): string | null {
   if (!portalReady(profile)) return null;
   const phone = profile.phone?.trim() || profile.whatsappPhone?.trim() || "";
   const url = new URL("https://portal.lassi.tech/");
@@ -67,6 +68,7 @@ export function ficheLink(profile: CompanyProfile, cfg: FormConfig, isDefault = 
   url.searchParams.set("to", phone);
   if (profile.accentColor) url.searchParams.set("accent", profile.accentColor.replace("#", ""));
   if (!isDefault) url.searchParams.set("cfg", b64urlEncode(compactCfg(cfg)));
+  if (lang && lang !== "fr") url.searchParams.set("lang", lang);
   if (typeof location !== "undefined" && /^https?:$/.test(location.protocol)) {
     url.searchParams.set("app", location.origin + location.pathname);
   }
